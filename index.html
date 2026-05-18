@@ -574,7 +574,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxM
   } else if(l){
     const lc=l.type==='credit'?'var(--green)':'var(--red)';
     lH=`<td class="ed" contenteditable="true" onblur="editL('date','${l.id}',this)">${l.date}</td>
-      <td class="amt ed" contenteditable="true" onblur="editL('amount','${l.id}',this)" style="color:${lc}">${fmtC(l.amount,l.cur)}</td>
+      <td class="amt ed" style="color:${lc};line-height:1.6"><span contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmtC(l.amount,l.cur)}</span>${l.cur!=='ILS'&&FX_RATES[l.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(l.amount*FX_RATES[l.cur]))}</span>`:''}</td>
       <td>${l.cur}</td>
       <td class="ed" contenteditable="true" onblur="editL('cat','${l.id}',this)">${l.cat}</td>
       <td class="ed" contenteditable="true" onblur="editL('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
