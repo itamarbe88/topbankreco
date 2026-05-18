@@ -90,7 +90,7 @@ select.biz:focus{outline:none;border-color:var(--orange)}
 .l-sub{font-size:11px;color:var(--muted)}
 .grid-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
 .grid-scroll{overflow:auto;max-height:calc(100vh - 310px)}
-table.ut{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+table.ut{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto}
 table.ut thead tr.sec th{padding:8px 12px;background:var(--black);color:rgba(255,255,255,.5);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;position:sticky;top:0;z-index:4;border-bottom:0}
 table.ut thead tr.sec th.s-bank,table.ut thead tr.sec th.s-ldg{color:#fff}
 table.ut thead tr.sec th.s-ctr{background:var(--black);color:rgba(255,255,255,.25);width:88px;text-align:center;border-left:1px solid #1e293b;border-right:1px solid #1e293b}
@@ -100,7 +100,7 @@ table.ut thead tr.col th.ctr{background:#f8fafc;border-left:1.5px solid var(--bo
 table.ut tbody tr{border-bottom:1px solid #f1f5f9;transition:background .08s}
 table.ut tbody tr:hover{background:#fafafa}
 table.ut tbody tr.sel{background:var(--ol)!important}
-table.ut tbody td{padding:8px 10px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+table.ut tbody td{padding:8px 10px;color:var(--ink2);white-space:nowrap;vertical-align:middle}
 table.ut tbody td.chk{padding-left:12px;width:32px}
 table.ut tbody td.amt{font-weight:700;color:var(--black);font-variant-numeric:tabular-nums}
 table.ut tbody td.dim{color:var(--subtle);font-size:11px}
@@ -499,7 +499,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1){
     ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
       <td>${b.date}</td><td class="amt" style="color:${dc(b)}">${fmt(b.amount)}</td><td>${b.cur}</td>
       <td title="${b.cat}">${b.cat}</td>
-      <td title="${b.desc}"><span style="font-weight:600;color:var(--black)">${b.desc}</span></td>
+      <td title="${b.desc}">${b.desc}</td>
       <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
     :`<td class="chk"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
   let lH;
