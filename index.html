@@ -434,7 +434,11 @@ function render(){
       const meta=GM[g.type],isR=g.type==='rule',isFamt=g.type==='famt';
       const bItems=g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
       const lItems=isR?(g.proposedLedgers||[]):g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
-      const sumB=bItems.reduce((a,x)=>a+x.amount,0),sumL=lItems.reduce((a,x)=>a+x.amount,0),diff=Math.abs(sumB-sumL);
+      const chkB=bItems.filter(x=>x.chk),chkL=lItems.filter(x=>x.chk);
+      const hasChk=chkB.length>0||chkL.length>0;
+      const sumB=(hasChk?chkB:bItems).reduce((a,x)=>a+x.amount,0);
+      const sumL=(hasChk?chkL:lItems).reduce((a,x)=>a+x.amount,0);
+      const diff=Math.abs(sumB-sumL);
       // group header — no tag badge, plain text label
       const hr=document.createElement('tr');hr.className='gh';
       let hNote=isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>'
@@ -482,6 +486,7 @@ function render(){
       let bh;
       if(isR) bh=`<span style="color:var(--green);font-weight:700;font-size:11px">✓ Balanced on confirm</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> = Proposed: <b>${fmt(sumL)}</b></span>`;
       else if(diff<0.01) bh=`<span style="color:var(--green);font-weight:700;font-size:11px">✓ Balanced</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> = Ledger: <b>${fmt(sumL)}</b></span>`;
+      else if(hasChk&&(g.type==='1many'||g.type==='many1')) bh=`<span style="color:var(--red);font-weight:700;font-size:11px">⚠ Unbalanced</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> · Ledger: <b>${fmt(sumL)}</b></span>`;
       else bh=`<span style="color:var(--amber);font-weight:700;font-size:11px">≈ ${fmt(diff)} diff</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> · Ledger: <b>${fmt(sumL)}</b></span>`;
       if(isFamt){
         // No Confirm button — handled per row
@@ -570,10 +575,20 @@ function editL(f,id,el){
   updateBal();
 }
 function toggle(side,id,chk){
-  if(side==='bank') bankLines.find(b=>b.id===id).chk=chk;
-  else ledgerItems.find(l=>l.id===id).chk=chk;
-  event.target.closest('tr')?.classList.toggle('sel',chk);
-  updateBal();
+  if(side==='bank'){
+    const b=bankLines.find(x=>x.id===id);if(b)b.chk=chk;
+    if(sugDone){
+      const g=suggGroups.find(g=>['full','ftxt'].includes(g.type)&&g.bankIds.includes(id));
+      if(g){const l=ledgerItems.find(x=>x.id===g.ledgerIds[g.bankIds.indexOf(id)]);if(l)l.chk=chk;}
+    }
+  } else {
+    const l=ledgerItems.find(x=>x.id===id);if(l)l.chk=chk;
+    if(sugDone){
+      const g=suggGroups.find(g=>['full','ftxt'].includes(g.type)&&g.ledgerIds.includes(id));
+      if(g){const b=bankLines.find(x=>x.id===g.bankIds[g.ledgerIds.indexOf(id)]);if(b)b.chk=chk;}
+    }
+  }
+  render();
 }
 function selAll(side,chk){
   if(side==='bank') bankLines.forEach(b=>b.chk=chk);
