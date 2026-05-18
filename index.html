@@ -368,9 +368,9 @@ let bankLines=[
   {id:'b2', date:'2024-05-02',amount:8000, cur:'ILS',cat:'Payroll',        desc:'SALARY PROCESSING', bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
   {id:'b12',date:'2024-05-16',amount:12000,cur:'ILS',cat:'Payroll',        desc:'SALARY BATCH',      bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
   // 1:1 Fuzzy Amount — vendor single-account ×3, internal multi-account ×1
-  {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:0,    chk:false},
-  {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:5,    chk:false},
-  {id:'b21',date:'2024-05-12',amount:1850, cur:'USD',cat:'SaaS',           desc:'STRIPE INC',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:12.5, chk:false},
+  {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:5,    chk:false},
+  {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:10,   chk:false},
+  {id:'b21',date:'2024-05-12',amount:2978, cur:'ILS',cat:'SaaS',           desc:'STRIPE INC',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:12,   fxAmt:1000,fxCur:'USD',fxRate:2.99,chk:false},
   {id:'b22',date:'2024-05-15',amount:5000, cur:'ILS',cat:'Transfer',       desc:'INTERBANK WIRE OUT',bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:15,   isInternal:true,chk:false},
   // 1:Many ×2
   {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
@@ -401,7 +401,7 @@ let ledgerItems=[
   // 1:1 Fuzzy Amount ×2  (ledger > bank)
   {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
   {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
-  {id:'l21',date:'2024-05-14',amount:1900, cur:'USD',cat:'SaaS',           desc:'Monthly subscription fee',  acc:'SVC-002',type:'debit', chk:false},
+  {id:'l21',date:'2024-05-10',amount:3000, cur:'ILS',cat:'SaaS',           desc:'Monthly subscription fee',  acc:'SVC-002',type:'debit', fxAmt:1000,fxCur:'USD',fxRate:3.00,chk:false},
   {id:'l22',date:'2024-05-16',amount:4976, cur:'ILS',cat:'Transfer',       desc:'Funds cleared receiving account',acc:'IL-456-7890',type:'credit',chk:false},
   // 1:Many ×2
   {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
@@ -488,16 +488,22 @@ function render(){
           const b=bItems[i],l=lItems[i];
           if(!b&&!l)continue;
           const isDis=b&&l&&dismissed.has(b.id+':'+l.id);
-          const isFX=b&&b.cur!=='ILS';
           const isInt=b&&!!b.isInternal;
           const pDiff=b&&l?Math.round(Math.abs(b.amount-l.amount)*100)/100:0;
           const pFee=b?Math.round((b.fee||0)*100)/100:0;
           const pFX=Math.max(0,Math.round((pDiff-pFee)*100)/100);
+          const hasFX=b&&(!!b.fxAmt||pFX>0.001);
+          const hasFee=pFee>0.001;
           const varLabel=isInt?'Spread':'FX diff';
           const varLine=b&&l?`<div style="font-size:10px;color:var(--subtle);line-height:1.7;text-align:center;margin-bottom:2px">`
             +`<b style="color:var(--ink2)">${fmtC(pDiff,b.cur)}</b> variance<br>`
             +`Fee ${fmtC(pFee,b.cur)} · ${varLabel} ${fmtC(pFX,b.cur)}</div>`:'';
-          const amtTag=b&&!isDis?`<span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isInt?'Internal':(isFX?'FX':'Bank Fee')}</span>`:'';
+          const amtTag=b&&!isDis?[
+            hasFX?`<span class="tag tg-info" style="font-size:10px">FX</span>`:'',
+            hasFee?`<span class="tag tg-famt" style="font-size:10px">Bank Fee</span>`:'',
+            isInt&&!hasFX&&!hasFee?`<span class="tag tg-famt" style="font-size:10px">Internal</span>`:'',
+          ].filter(Boolean).join(' '):'';
+
           let ctr;
           if(isDis){
             ctr=`<div style="display:flex;flex-direction:column;gap:5px;align-items:center">
@@ -581,7 +587,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxM
   const dc=b=>(b.type==='credit'?'var(--green)':'var(--red)');
   const bH=b
     ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
-      <td>${b.date}</td><td class="amt" style="color:${dc(b)};line-height:1.6">${fmtC(b.amount,b.cur)}${b.cur!=='ILS'&&FX_RATES[b.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(b.amount*FX_RATES[b.cur]))}</span>`:''}${bankAmtNote?`<br>${bankAmtNote}`:''}</td><td>${b.cur}</td>
+      <td>${b.date}</td><td class="amt" style="color:${dc(b)};line-height:1.6">${fmtC(b.amount,b.cur)}${b.fxAmt?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">${b.fxAmt.toLocaleString()} ${b.fxCur} · 1=${b.fxRate}</span>`:(b.cur!=='ILS'&&FX_RATES[b.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(b.amount*FX_RATES[b.cur]))}</span>`:'')}${bankAmtNote?`<br>${bankAmtNote}`:''}</td><td>${b.cur}</td>
       <td title="${b.cat}">${b.cat}</td>
       <td title="${b.desc}">${b.desc}</td>
       <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
@@ -596,7 +602,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxM
   } else if(l){
     const lc=l.type==='credit'?'var(--green)':'var(--red)';
     lH=`<td class="ed" contenteditable="true" onblur="editL('date','${l.id}',this)">${l.date}</td>
-      <td class="amt ed" style="color:${lc};line-height:1.6"><span contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmtC(l.amount,l.cur)}</span>${l.cur!=='ILS'&&FX_RATES[l.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(l.amount*FX_RATES[l.cur]))}</span>`:''}</td>
+      <td class="amt ed" style="color:${lc};line-height:1.6"><span contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmtC(l.amount,l.cur)}</span>${l.fxAmt?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">${l.fxAmt.toLocaleString()} ${l.fxCur} · 1=${l.fxRate}</span>`:(l.cur!=='ILS'&&FX_RATES[l.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(l.amount*FX_RATES[l.cur]))}</span>`:'')}</td>
       <td>${l.cur}</td>
       <td class="ed" contenteditable="true" onblur="editL('cat','${l.id}',this)">${l.cat}</td>
       <td class="ed" contenteditable="true" onblur="editL('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
