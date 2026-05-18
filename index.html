@@ -347,59 +347,59 @@ table.rlt tr:hover td{background:#f8fafc}
 
 <script>
 let bankLines=[
-  // Full Parity ×2
-  {id:'b1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Supplies',desc:'STAPLES STORE',      bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',      desc:'OFFICE DEPOT',        bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  // Fuzzy Text ×2
-  {id:'b2', date:'2024-05-02',amount:8000, cur:'ILS',cat:'Payroll',        desc:'SALARY PROCESSING',   bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
-  {id:'b12',date:'2024-05-16',amount:12000,cur:'ILS',cat:'Payroll',        desc:'SALARY BATCH',        bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
-  // Fuzzy Amount ×2
-  {id:'b3', date:'2024-05-03',amount:250,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',     bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b13',date:'2024-05-17',amount:450,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',          bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  // 1:1 Full Parity ×2
+  {id:'b1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Supplies',desc:'STAPLES STORE',    bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',      desc:'OFFICE DEPOT',      bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  // 1:1 Fuzzy Text ×2
+  {id:'b2', date:'2024-05-02',amount:8000, cur:'ILS',cat:'Payroll',        desc:'SALARY PROCESSING', bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
+  {id:'b12',date:'2024-05-16',amount:12000,cur:'ILS',cat:'Payroll',        desc:'SALARY BATCH',      bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
+  // 1:1 Fuzzy Amount ×2  (bank < ledger)
+  {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   // 1:Many ×2
-  {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',     bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b14',date:'2024-05-18',amount:9000, cur:'ILS',cat:'Services',       desc:'PROJECT INVOICE',     bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b14',date:'2024-05-18',amount:9000, cur:'ILS',cat:'Services',       desc:'PROJECT INVOICE',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   // Many:1 ×2
-  {id:'b5', date:'2024-05-06',amount:1100, cur:'ILS',cat:'Travel',         desc:'EL AL FLIGHTS',       bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b6', date:'2024-05-06',amount:400,  cur:'ILS',cat:'Travel',         desc:'GETT TAXI',           bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
-  {id:'b15',date:'2024-05-20',amount:2200, cur:'ILS',cat:'Rent',           desc:'OFFICE RENT A',       bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b16',date:'2024-05-20',amount:1500, cur:'ILS',cat:'Rent',           desc:'PARKING SPACE',       bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
-  // Rule-Based ×4 (2 per category)
-  {id:'b7', date:'2024-05-08',amount:620,  cur:'ILS',cat:'Software',       desc:'ADOBE INC',           bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
-  {id:'b17',date:'2024-05-22',amount:180,  cur:'ILS',cat:'Software',       desc:'MICROSOFT 365',       bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
-  {id:'b8', date:'2024-05-10',amount:800,  cur:'ILS',cat:'Insurance',      desc:'MIGDAL INSURANCE',    bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b18',date:'2024-05-24',amount:350,  cur:'ILS',cat:'Insurance',      desc:'HAREL INSURANCE',     bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b5', date:'2024-05-06',amount:1100, cur:'ILS',cat:'Travel',         desc:'EL AL FLIGHTS',     bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b6', date:'2024-05-06',amount:400,  cur:'ILS',cat:'Travel',         desc:'GETT TAXI',         bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
+  {id:'b15',date:'2024-05-20',amount:2200, cur:'ILS',cat:'Rent',           desc:'OFFICE RENT A',     bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b16',date:'2024-05-20',amount:1500, cur:'ILS',cat:'Rent',           desc:'PARKING SPACE',     bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
+  // Rule-Based ×4 (4 distinct categories)
+  {id:'b7', date:'2024-05-08',amount:620,  cur:'ILS',cat:'Software',       desc:'ADOBE INC',         bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
+  {id:'b17',date:'2024-05-22',amount:180,  cur:'ILS',cat:'Software',       desc:'ZOOM VIDEO',        bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
+  {id:'b8', date:'2024-05-10',amount:800,  cur:'ILS',cat:'Insurance',      desc:'MIGDAL INSURANCE',  bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b18',date:'2024-05-24',amount:140,  cur:'ILS',cat:'Dining',         desc:'WOLT ORDER',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   // Unmatched
-  {id:'b9', date:'2024-05-12',amount:480,  cur:'ILS',cat:'Software',       desc:'AMAZON AWS',          bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
-  {id:'b10',date:'2024-05-14',amount:220,  cur:'ILS',cat:'Transport',      desc:'FUEL STATION',        bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
+  {id:'b9', date:'2024-05-12',amount:480,  cur:'ILS',cat:'Cloud',          desc:'AMAZON AWS',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'credit',chk:false},
+  {id:'b10',date:'2024-05-14',amount:220,  cur:'ILS',cat:'Transport',      desc:'FUEL STATION',      bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
 ];
 let ledgerItems=[
-  // Full Parity ×2
-  {id:'l1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Expenses', desc:'Stationery purchase',        acc:'EXP-001',chk:false},
-  {id:'l11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',       desc:'Office equipment purchase',   acc:'EQP-001',chk:false},
-  // Fuzzy Text ×2
-  {id:'l2', date:'2024-05-04',amount:8000, cur:'ILS',cat:'Salaries',        desc:'May salary disbursement',    acc:'SAL-001',chk:false},
-  {id:'l12',date:'2024-05-18',amount:12000,cur:'ILS',cat:'Salaries',        desc:'June salary disbursement',   acc:'SAL-001',chk:false},
-  // Fuzzy Amount ×2
-  {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',       acc:'UTL-001',chk:false},
-  {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',         acc:'TEL-001',chk:false},
+  // 1:1 Full Parity ×2
+  {id:'l1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Expenses', desc:'Stationery purchase',       acc:'EXP-001',type:'debit', chk:false},
+  {id:'l11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',       desc:'Office equipment purchase',  acc:'EQP-001',type:'debit', chk:false},
+  // 1:1 Fuzzy Text ×2
+  {id:'l2', date:'2024-05-04',amount:8000, cur:'ILS',cat:'Salaries',        desc:'May salary disbursement',   acc:'SAL-001',type:'debit', chk:false},
+  {id:'l12',date:'2024-05-18',amount:12000,cur:'ILS',cat:'Salaries',        desc:'June salary disbursement',  acc:'SAL-001',type:'debit', chk:false},
+  // 1:1 Fuzzy Amount ×2  (ledger > bank)
+  {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
+  {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
   // 1:Many ×2
-  {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',    acc:'CST-001',chk:false},
-  {id:'l5', date:'2024-05-05',amount:2000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 2',    acc:'CST-001',chk:false},
-  {id:'l14',date:'2024-05-18',amount:6000, cur:'ILS',cat:'Services',        desc:'Project completion fee',     acc:'SVC-001',chk:false},
-  {id:'l15',date:'2024-05-18',amount:3000, cur:'ILS',cat:'Services',        desc:'Project retention payment',  acc:'SVC-001',chk:false},
+  {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
+  {id:'l5', date:'2024-05-05',amount:2000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 2',   acc:'CST-001',type:'debit', chk:false},
+  {id:'l14',date:'2024-05-18',amount:6000, cur:'ILS',cat:'Services',        desc:'Project completion fee',    acc:'SVC-001',type:'debit', chk:false},
+  {id:'l15',date:'2024-05-18',amount:3000, cur:'ILS',cat:'Services',        desc:'Project retention payment', acc:'SVC-001',type:'debit', chk:false},
   // Many:1 ×2
-  {id:'l6', date:'2024-05-07',amount:1500, cur:'ILS',cat:'Travel',          desc:'Conference travel expenses', acc:'TRV-001',chk:false},
-  {id:'l16',date:'2024-05-20',amount:3700, cur:'ILS',cat:'Rent',            desc:'Combined office rent May',   acc:'RNT-001',chk:false},
+  {id:'l6', date:'2024-05-07',amount:1500, cur:'ILS',cat:'Travel',          desc:'Conference travel expenses',acc:'TRV-001',type:'debit', chk:false},
+  {id:'l16',date:'2024-05-20',amount:3700, cur:'ILS',cat:'Rent',            desc:'Combined office rent May',  acc:'RNT-001',type:'debit', chk:false},
   // Unmatched
-  {id:'l7', date:'2024-04-30',amount:2200, cur:'ILS',cat:'Consulting',      desc:'External consultant fee',    acc:'EXP-002',chk:false},
-  {id:'l8', date:'2024-05-09',amount:680,  cur:'ILS',cat:'Marketing',       desc:'Social media campaign',      acc:'MKT-001',chk:false},
+  {id:'l7', date:'2024-04-30',amount:2200, cur:'ILS',cat:'Consulting',      desc:'External consultant fee',   acc:'EXP-002',type:'debit', chk:false},
+  {id:'l8', date:'2024-05-09',amount:680,  cur:'ILS',cat:'Marketing',       desc:'Campaign revenue share',    acc:'MKT-001',type:'credit',chk:false},
 ];
 let rules=[
-  {id:'r1',bdesc:'ADOBE',     bcat:'Software', tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Adobe CC subscription',       lcat:'Software Licenses'},
-  {id:'r2',bdesc:'MIGDAL',    bcat:'Insurance',tx:'debit',rail:'',amin:'500',amax:'1200',bacc:'IL-123-4567',mcc:'',ldesc:'Insurance premium',            lcat:'Insurance'},
-  {id:'r3',bdesc:'MICROSOFT', bcat:'Software', tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Microsoft 365 subscription',   lcat:'Software Licenses'},
-  {id:'r4',bdesc:'HAREL',     bcat:'Insurance',tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Insurance premium',            lcat:'Insurance'},
+  {id:'r1',bdesc:'ADOBE',  bcat:'Software', tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Adobe CC subscription',    lcat:'SaaS'},
+  {id:'r2',bdesc:'MIGDAL', bcat:'Insurance',tx:'debit',rail:'',amin:'500',amax:'1200',bacc:'IL-123-4567',mcc:'',ldesc:'Insurance premium',         lcat:'Insure'},
+  {id:'r3',bdesc:'ZOOM',   bcat:'Software', tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Zoom video subscription',   lcat:'Comms'},
+  {id:'r4',bdesc:'WOLT',   bcat:'Dining',   tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Team lunch / catering',     lcat:'Dining'},
 ];
 let matched=[],suggGroups=[],matchCounter=0,sugDone=false;
 
@@ -439,7 +439,7 @@ function render(){
       body.appendChild(hr);
       // rows
       const rc=Math.max(bItems.length,lItems.length);
-      for(let i=0;i<rc;i++) body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,i===0?g.type:'__cont',isR?(g.ruleCats&&g.ruleCats[i]):null,isR));
+      for(let i=0;i<rc;i++) body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,isR?g.type:(i===0?g.type:'__cont'),isR?(g.ruleCats&&g.ruleCats[i]):null,isR));
       // footer
       const fr=document.createElement('tr');fr.className='gf';
       let bh;
@@ -478,12 +478,16 @@ function mkRow(b,l,tag,ruleCat,isP){
   let ctr='';
   if(tag&&tag!=='__cont'){
     const m=GM[tag];
-    if(m) ctr=`<span class="tag ${m.cls}" style="font-size:10px">${m.icon}</span>`;
-    if(isP&&ruleCat) ctr+=`<br><span class="tag tg-new" style="margin-top:2px;font-size:9px">New · ${ruleCat}</span>`;
+    if(ruleCat){
+      ctr=`<span class="tag tg-rule" style="font-size:10px;white-space:nowrap">Rule-Based · ${ruleCat}</span>`;
+    } else if(m){
+      ctr=`<span class="tag ${m.cls}" style="font-size:10px">${m.label}</span>`;
+    }
   }
+  const dc=b=>(b.type==='credit'?'var(--green)':'var(--red)');
   const bH=b
     ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
-      <td>${b.date}</td><td class="amt">${fmt(b.amount)}</td><td>${b.cur}</td>
+      <td>${b.date}</td><td class="amt" style="color:${dc(b)}">${fmt(b.amount)}</td><td>${b.cur}</td>
       <td title="${b.cat}">${b.cat}</td>
       <td title="${b.desc}"><span style="font-weight:600;color:var(--black)">${b.desc}</span></td>
       <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
@@ -496,8 +500,9 @@ function mkRow(b,l,tag,ruleCat,isP){
       <td class="prop dim" title="${l.desc}">${l.desc}</td>
       <td class="prop dim">AUTO</td><td class="chk prop"></td>`;
   } else if(l){
+    const lc=l.type==='credit'?'var(--green)':'var(--red)';
     lH=`<td class="ed" contenteditable="true" onblur="editL('date','${l.id}',this)">${l.date}</td>
-      <td class="amt ed" contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmt(l.amount)}</td>
+      <td class="amt ed" contenteditable="true" onblur="editL('amount','${l.id}',this)" style="color:${lc}">${fmt(l.amount)}</td>
       <td>${l.cur}</td>
       <td class="ed" contenteditable="true" onblur="editL('cat','${l.id}',this)">${l.cat}</td>
       <td class="ed" contenteditable="true" onblur="editL('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
@@ -556,18 +561,21 @@ function runSuggest(){
   setTimeout(()=>{
     clearInterval(iv);suggGroups=[];
     const usedB=new Set(),usedL=new Set();
-    // 1 full parity
+    // 1 full parity — ALL matches into ONE group
+    const fullG={type:'full',bankIds:[],ledgerIds:[]};
     bankLines.forEach(b=>{
       if(usedB.has(b.id))return;
       ledgerItems.forEach(l=>{
         if(usedL.has(l.id)||usedB.has(b.id))return;
         if(b.amount===l.amount&&b.cur===l.cur&&dayDiff(b.date,l.date)<=1){
-          suggGroups.push({type:'full',bankIds:[b.id],ledgerIds:[l.id]});
+          fullG.bankIds.push(b.id);fullG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
       });
     });
-    // 2 fuzzy text
+    if(fullG.bankIds.length) suggGroups.push(fullG);
+    // 2 fuzzy text — ALL matches into ONE group
+    const ftxtG={type:'ftxt',bankIds:[],ledgerIds:[]};
     bankLines.forEach(b=>{
       if(usedB.has(b.id))return;
       const bw=b.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
@@ -576,23 +584,26 @@ function runSuggest(){
         const lw=l.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
         const ov=bw.some(w=>lw.some(x=>x.includes(w)||w.includes(x)));
         if(ov&&Math.abs(b.amount-l.amount)/b.amount<0.05&&dayDiff(b.date,l.date)<=3){
-          suggGroups.push({type:'ftxt',bankIds:[b.id],ledgerIds:[l.id]});
+          ftxtG.bankIds.push(b.id);ftxtG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
       });
     });
-    // 3 fuzzy amount
+    if(ftxtG.bankIds.length) suggGroups.push(ftxtG);
+    // 3 fuzzy amount — ALL matches into ONE group
+    const famtG={type:'famt',bankIds:[],ledgerIds:[]};
     bankLines.forEach(b=>{
       if(usedB.has(b.id))return;
       ledgerItems.forEach(l=>{
         if(usedL.has(l.id)||usedB.has(b.id))return;
         const co=b.cat.split(' ')[0].toLowerCase()===l.cat.split(' ')[0].toLowerCase();
         if(co&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
-          suggGroups.push({type:'famt',bankIds:[b.id],ledgerIds:[l.id]});
+          famtG.bankIds.push(b.id);famtG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
       });
     });
+    if(famtG.bankIds.length) suggGroups.push(famtG);
     // 4 1:many
     bankLines.forEach(b=>{
       if(usedB.has(b.id))return;
