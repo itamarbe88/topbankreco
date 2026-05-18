@@ -166,6 +166,10 @@ table.rlt tr:hover td{background:#f8fafc}
 .toast.green{background:var(--green)}.toast.blue{background:var(--black)}
 @keyframes tin{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
 .hidden{display:none!important}
+.ctx-menu{position:fixed;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;box-shadow:0 6px 24px rgba(0,0,0,.14);z-index:300;min-width:168px;overflow:hidden;display:none}
+.ctx-item{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;transition:background .1s;white-space:nowrap}
+.ctx-item:hover{background:var(--ol);color:var(--od)}
+.ctx-item svg{width:13px;height:13px;flex-shrink:0;color:var(--orange)}
 </style>
 </head>
 <body>
@@ -346,6 +350,11 @@ table.rlt tr:hover td{background:#f8fafc}
   </div>
 </div>
 
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" onclick="ctxAddLedger()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Ledger Item
+  </div>
+</div>
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
@@ -431,7 +440,7 @@ function render(){
   body.innerHTML='';
   if(!sugDone){
     const mx=Math.max(bankLines.length,ledgerItems.length);
-    for(let i=0;i<mx;i++) body.appendChild(mkRow(bankLines[i]||null,ledgerItems[i]||null,null,null,false));
+    for(let i=0;i<mx;i++) body.appendChild(mkRow(bankLines[i]||null,ledgerItems[i]||null,null,null,false,1,false,null,true));
   } else {
     const usedB=new Set(suggGroups.flatMap(g=>g.bankIds));
     const usedL=new Set(suggGroups.flatMap(g=>g.ledgerIds||[]));
@@ -521,7 +530,7 @@ function render(){
       </td><td class="ctr" style="background:#f1f5f9"></td><td colspan="7" style="background:#f1f5f9"></td>`;
       body.appendChild(ur);
       const mx=Math.max(unmB.length,unmL.length);
-      for(let i=0;i<mx;i++) body.appendChild(mkRow(unmB[i]||null,unmL[i]||null,null,null,false));
+      for(let i=0;i<mx;i++) body.appendChild(mkRow(unmB[i]||null,unmL[i]||null,null,null,false,1,false,null,true));
     }
   }
   document.getElementById('cnt-b').textContent=bankLines.length;
@@ -529,10 +538,11 @@ function render(){
   updateBal();updateBadges();
 }
 
-function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null){
+function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxMenu=false){
   const tr=document.createElement('tr');
   if((b&&b.chk)||(l&&l.chk))tr.classList.add('sel');
   if(subStart)tr.classList.add('sm-div');
+  if(allowCtxMenu&&b)tr.setAttribute('oncontextmenu',`openCtxMenu(event,'${b.id}')`);
   let ctr='';
   if(tag&&tag!=='__cont'){
     const m=GM[tag];
@@ -855,8 +865,10 @@ function saveRule(){
   toast('Rule saved');
 }
 function delRule(id){rules=rules.filter(r=>r.id!==id);renderRules();}
-function openFly(){
-  const sel=bankLines.filter(b=>b.chk);
+function openFly(bankId=null){
+  let sel;
+  if(bankId){const b=bankLines.find(x=>x.id===bankId);sel=b?[b]:[];}
+  else sel=bankLines.filter(b=>b.chk);
   if(!sel.length){toast('Select at least one bank line first','blue');return;}
   document.getElementById('fly-amt').value=sel.reduce((a,b)=>a+b.amount,0);
   document.getElementById('fly-date').value=sel[0].date;
@@ -878,6 +890,19 @@ function onBizChange(v){
   bankLines.forEach(b=>b.chk=false);ledgerItems.forEach(l=>l.chk=false);
   render();toast('Loaded: '+document.querySelector('.biz').selectedOptions[0].text,'blue');
 }
+let _ctxBankId=null;
+function openCtxMenu(e,bankId){
+  e.preventDefault();e.stopPropagation();
+  _ctxBankId=bankId;
+  const m=document.getElementById('ctx-menu');
+  m.style.display='block';
+  const x=Math.min(e.clientX,window.innerWidth-180),y=Math.min(e.clientY,window.innerHeight-60);
+  m.style.left=x+'px';m.style.top=y+'px';
+}
+function closeCtxMenu(){document.getElementById('ctx-menu').style.display='none';_ctxBankId=null;}
+function ctxAddLedger(){const id=_ctxBankId;closeCtxMenu();openFly(id);}
+document.addEventListener('click',closeCtxMenu);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtxMenu();});
 render();updateBadges();renderMatched();
 </script>
 </body>
