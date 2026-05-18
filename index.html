@@ -515,7 +515,7 @@ function render(){
             ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
               ${varLine}
               <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:82px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
-              ${!isInt?`<button class="btn-danger-sm" style="font-size:10px;padding:3px 5px;width:82px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Partial Payment</button>`:''}
+              ${!isInt?`<button class="btn-danger-sm" style="font-size:10px;padding:3px 5px;width:82px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Match Partially</button>`:''}
             </div>`:'';
           }
           const row=mkRow(b||null,l||null,null,null,false,1,false,ctr,false,amtTag);
@@ -810,9 +810,12 @@ function writeOff(bankId,ledgerId){
   const b=bankLines.find(x=>x.id===bankId),l=ledgerItems.find(x=>x.id===ledgerId);
   if(!b||!l)return;
   const diff=Math.round(Math.abs(l.amount-b.amount)*100)/100;
+  const pFee=Math.round((b.fee||0)*100)/100;
+  const pFX=Math.max(0,Math.round((diff-pFee)*100)/100);
+  const fxTag=b.fxAmt&&pFX>0.001?((b.type==='credit'?b.amount<l.amount:b.amount>l.amount)?'FX Loss':'FX Gain'):null;
   matchCounter++;
   const extras=diff>0.001?[{id:'wo_'+Date.now(),date:b.date,amount:diff,cur:b.cur,cat:'Write-off',desc:'Write-off adjustment',acc:'WO-001',type:'debit',chk:false}]:[];
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l,...extras],type:'suggestion',kind:'1:1 Fuzzy Amount'});
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l,...extras],type:'suggestion',kind:'1:1 Fuzzy Amount',fxTag});
   bankLines=bankLines.filter(x=>x.id!==bankId);
   ledgerItems=ledgerItems.filter(x=>x.id!==ledgerId);
   const gi=suggGroups.findIndex(g=>g.type==='famt');
@@ -836,8 +839,12 @@ function undismiss(bankId,ledgerId){
 function keepOpen(bankId,ledgerId){
   const b=bankLines.find(x=>x.id===bankId),l=ledgerItems.find(x=>x.id===ledgerId);
   if(!b||!l)return;
+  const diff=Math.round(Math.abs(l.amount-b.amount)*100)/100;
+  const pFee=Math.round((b.fee||0)*100)/100;
+  const pFX=Math.max(0,Math.round((diff-pFee)*100)/100);
+  const fxTag=b.fxAmt&&pFX>0.001?((b.type==='credit'?b.amount<l.amount:b.amount>l.amount)?'FX Loss':'FX Gain'):null;
   matchCounter++;
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l],type:'partial',kind:'Partially Paid'});
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l],type:'partial',kind:'Partially Paid',fxTag});
   bankLines=bankLines.filter(x=>x.id!==bankId);
   ledgerItems=ledgerItems.filter(x=>x.id!==ledgerId);
   const gi=suggGroups.findIndex(g=>g.type==='famt');
@@ -877,7 +884,7 @@ function renderMatched(){
         </div>
       </td>
       <td style="color:var(--muted);white-space:nowrap;font-size:11px;vertical-align:top;padding-top:10px">${m.on}</td>
-      <td style="vertical-align:top;padding-top:10px"><span class="tag ${typeCls}">${typeLabel}</span></td>
+      <td style="vertical-align:top;padding-top:10px"><div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px"><span class="tag ${typeCls}">${typeLabel}</span>${m.fxTag?`<span class="tag ${m.fxTag==='FX Loss'?'tg-famt':'tg-sug'}">${m.fxTag}</span>`:''}</div></td>
       <td style="vertical-align:top;padding-top:10px"><span class="tag tg-info">${m.kind}</span></td>
       <td style="vertical-align:top;padding-top:8px"><button class="btn-danger-sm" onclick="revertMatch(${m.id})">Revert</button></td>
     </tr>`;
