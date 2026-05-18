@@ -5,278 +5,206 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TopBankReco — Bank Reconciliation</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-:root {
-  --orange:#f97316;--orange-dark:#ea580c;--orange-light:#fff7ed;--orange-mid:#fed7aa;
-  --green:#16a34a;--green-light:#dcfce7;--red:#dc2626;--red-light:#fee2e2;
-  --black:#0f172a;--ink:#1e293b;--ink2:#334155;--muted:#64748b;--subtle:#94a3b8;
-  --border:#e2e8f0;--bg:#f1f5f9;--surface:#ffffff;--amber:#d97706;--amber-light:#fef3c7;
-  --purple:#7e22ce;--purple-light:#f3e8ff;--blue:#0369a1;--blue-light:#e0f2fe;
-  --sidebar:220px;
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+:root{
+  --orange:#f97316;--od:#ea580c;--ol:#fff7ed;--om:#fed7aa;
+  --green:#16a34a;--gl:#dcfce7;--red:#dc2626;--rl:#fee2e2;
+  --black:#0f172a;--ink:#1e293b;--ink2:#334155;
+  --muted:#64748b;--subtle:#94a3b8;--ghost:#cbd5e1;
+  --border:#e2e8f0;--bg:#f1f5f9;--surface:#fff;
+  --amber:#d97706;--al:#fef3c7;--blue:#0369a1;--bl:#e0f2fe;
+  --purple:#7c3aed;--pl:#ede9fe;--pink:#be185d;--pkl:#fce7f3;
+  --sidebar:216px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;min-height:100vh;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
-
-/* ── Top bar ── */
-.topbar{background:var(--black);padding:0 20px;display:flex;align-items:center;height:52px;gap:0;flex-shrink:0;z-index:20;position:sticky;top:0}
-.logo{font-size:17px;font-weight:800;color:var(--orange);letter-spacing:-.5px;display:flex;align-items:center;gap:8px;width:var(--sidebar);flex-shrink:0}
-.logo-icon{width:30px;height:30px;background:var(--orange);border-radius:7px;display:flex;align-items:center;justify-content:center}
-.logo-icon svg{width:16px;height:16px;color:white}
-.topbar-crumb{color:#475569;font-size:12px;font-weight:500;padding-left:20px;border-left:1px solid #334155}
-.topbar-crumb span{color:#94a3b8}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-dark));display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700}
-
-/* ── App shell ── */
-.app{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
-
-/* ── Sidebar ── */
-.sidebar{width:var(--sidebar);background:var(--black);flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto;padding:16px 0}
-.sidebar-section{padding:0 12px;margin-bottom:4px}
-.sidebar-label{font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em;padding:0 8px;margin-bottom:6px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:500;transition:all .15s;margin-bottom:2px}
-.nav-item:hover{background:rgba(255,255,255,.07);color:#e2e8f0}
-.nav-item.active{background:var(--orange);color:white;font-weight:600}
-.nav-item svg{width:15px;height:15px;flex-shrink:0}
-.nav-divider{height:1px;background:#1e293b;margin:10px 12px}
-
-/* ── Main content ── */
-.main{flex:1;overflow:auto;padding:22px 24px}
-
-/* ── Page header ── */
-.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.page-title{font-size:20px;font-weight:800;color:var(--black);letter-spacing:-.4px}
-.page-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.biz-wrap{display:flex;align-items:center;gap:8px}
-.biz-wrap label{color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-select.biz{border:1.5px solid var(--border);border-radius:9px;padding:7px 28px 7px 11px;font-size:13px;font-weight:600;font-family:inherit;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2364748b' d='M5 7L1 3h8z'/%3E%3C/svg%3E") no-repeat right 9px center;color:var(--ink);appearance:none;cursor:pointer;min-width:200px;box-shadow:0 1px 3px rgba(0,0,0,.06);transition:border-color .15s}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:13px;min-height:100vh;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+.topbar{background:var(--black);padding:0 18px;display:flex;align-items:center;height:52px;flex-shrink:0;position:sticky;top:0;z-index:30}
+.logo{font-size:16px;font-weight:800;color:var(--orange);letter-spacing:-.5px;display:flex;align-items:center;gap:8px;width:var(--sidebar);flex-shrink:0}
+.logo-icon{width:28px;height:28px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:14px;height:14px;color:#fff}
+.tb-crumb{color:#475569;font-size:11px;font-weight:500;padding-left:16px;border-left:1px solid #1e293b}
+.tb-crumb b{color:#94a3b8}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--od));display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700}
+.app{display:flex;flex:1;height:calc(100vh - 52px);overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--black);flex-shrink:0;overflow-y:auto;padding:14px 0}
+.s-lbl{font-size:9px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:.08em;padding:0 20px;margin-bottom:5px}
+.s-item{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:0 8px 2px;border-radius:8px;cursor:pointer;color:#64748b;font-size:12px;font-weight:500;transition:all .12s}
+.s-item:hover{background:rgba(255,255,255,.06);color:#cbd5e1}
+.s-item.on{background:var(--orange);color:#fff;font-weight:600}
+.s-item svg{width:14px;height:14px;flex-shrink:0}
+.s-div{height:1px;background:#1e293b;margin:10px 16px}
+.main{flex:1;overflow-y:auto;padding:20px 22px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ph-title{font-size:19px;font-weight:800;color:var(--black);letter-spacing:-.4px}
+.ph-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.biz-row{display:flex;align-items:center;gap:7px}
+.biz-row label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+select.biz{border:1.5px solid var(--border);border-radius:9px;padding:6px 28px 6px 10px;font-size:12px;font-weight:600;font-family:inherit;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2364748b' d='M5 7L1 3h8z'/%3E%3C/svg%3E") no-repeat right 8px center;color:var(--ink);appearance:none;cursor:pointer;min-width:195px;box-shadow:0 1px 2px rgba(0,0,0,.06);transition:border-color .12s}
 select.biz:focus{outline:none;border-color:var(--orange)}
-
-/* ── Tabs ── */
-.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px}
-.tab{padding:9px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
-.tab:hover{color:var(--ink2)}
-.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
-.badge{display:inline-block;background:#f1f5f9;color:var(--muted);border-radius:20px;padding:1px 7px;font-size:11px;font-weight:600;margin-left:5px}
-.tab.active .badge{background:var(--orange-light);color:var(--orange-dark)}
-
-/* ── Toolbar ── */
-.toolbar{display:flex;align-items:center;gap:7px;margin-bottom:12px}
-.spacer{flex:1}
-
-/* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;border:1.5px solid transparent;transition:all .15s;white-space:nowrap}
-.btn svg{width:13px;height:13px;flex-shrink:0}
-.btn-primary{background:var(--orange);color:white;border-color:var(--orange);box-shadow:0 2px 8px rgba(249,115,22,.3)}
-.btn-primary:hover{background:var(--orange-dark);border-color:var(--orange-dark)}
-.btn-primary:disabled{background:#cbd5e1;border-color:#cbd5e1;box-shadow:none;cursor:not-allowed}
-.btn-success{background:var(--green);color:white;border-color:var(--green);box-shadow:0 2px 8px rgba(22,163,74,.25)}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:14px}
+.tab{padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s;white-space:nowrap}
+.tab:hover{color:var(--ink2)}.tab.on{color:var(--orange);border-bottom-color:var(--orange)}
+.bdg{display:inline-block;background:#f1f5f9;color:var(--muted);border-radius:20px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px}
+.tab.on .bdg{background:var(--ol);color:var(--od)}
+.toolbar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;border:1.5px solid transparent;transition:all .12s;white-space:nowrap;line-height:1}
+.btn svg{width:12px;height:12px;flex-shrink:0}
+.btn-primary{background:var(--orange);color:#fff;border-color:var(--orange);box-shadow:0 1px 6px rgba(249,115,22,.3)}
+.btn-primary:hover{background:var(--od);border-color:var(--od)}
+.btn-primary:disabled{background:var(--ghost);border-color:var(--ghost);box-shadow:none;cursor:not-allowed}
+.btn-success{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 1px 6px rgba(22,163,74,.25)}
 .btn-success:hover{background:#15803d}
-.btn-success:disabled{background:#cbd5e1;border-color:#cbd5e1;box-shadow:none;color:white;cursor:not-allowed}
-.btn-outline{background:var(--surface);color:var(--ink2);border-color:var(--border);box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.btn-outline:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-light)}
-.btn-sm{padding:5px 11px;font-size:11px}
-.btn-xs{padding:3px 8px;font-size:10px;border-radius:6px;font-weight:600;font-family:inherit;cursor:pointer;border:1.5px solid transparent;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
-.btn-danger-sm{background:var(--surface);color:var(--red);border:1.5px solid #fca5a5;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
-.btn-danger-sm:hover{background:var(--red-light)}
-
-/* ── Balance bar ── */
-.bal-bar{display:flex;align-items:center;background:var(--surface);border:1.5px solid var(--border);border-radius:11px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.bal-item{display:flex;flex-direction:column;gap:3px;padding:10px 16px;flex:1}
+.btn-outline{background:var(--surface);color:var(--ink2);border-color:var(--border);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.btn-outline:hover{border-color:var(--orange);color:var(--orange);background:var(--ol)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-danger-sm{background:var(--surface);color:var(--red);border:1.5px solid #fca5a5;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
+.btn-danger-sm:hover{background:var(--rl)}
+.bal-bar{display:flex;align-items:stretch;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.bal-item{display:flex;flex-direction:column;gap:2px;padding:9px 14px;flex:1}
 .bal-item+.bal-item{border-left:1px solid var(--border)}
-.bal-label{color:var(--subtle);font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.06em}
-.bal-val{font-size:15px;font-weight:700;color:var(--black);letter-spacing:-.3px}
-.bal-status{padding:0 16px;font-size:12px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:6px;border-left:1px solid var(--border)}
-.bal-status.ok{color:var(--green);background:var(--green-light)}
-.bal-status.bad{color:var(--red);background:var(--red-light)}
+.bal-lbl{color:var(--subtle);font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.06em}
+.bal-val{font-size:14px;font-weight:700;color:var(--black);letter-spacing:-.3px}
+.bal-status{padding:0 14px;font-size:11px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:5px;border-left:1px solid var(--border);min-width:140px}
+.bal-status.ok{color:var(--green);background:var(--gl)}
+.bal-status.warn{color:var(--amber);background:var(--al)}
+.bal-status.bad{color:var(--red);background:var(--rl)}
 .bal-status.idle{color:var(--subtle);background:#f8fafc}
-
-/* ── Tags ── */
-.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;letter-spacing:.01em}
-.tag-full   {background:var(--green-light);color:var(--green)}
-.tag-ftxt   {background:#dbeafe;color:#1d4ed8}
-.tag-famt   {background:var(--orange-light);color:var(--orange-dark)}
-.tag-1many  {background:var(--purple-light);color:var(--purple)}
-.tag-many1  {background:#fce7f3;color:#be185d}
-.tag-rule   {background:var(--amber-light);color:var(--amber)}
-.tag-manual {background:var(--purple-light);color:var(--purple)}
-.tag-sug    {background:var(--green-light);color:var(--green)}
-.tag-info   {background:var(--blue-light);color:var(--blue)}
-
-/* ── Grid area ── */
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.tg-full{background:var(--gl);color:var(--green)}
+.tg-ftxt{background:#dbeafe;color:#1d4ed8}
+.tg-famt{background:var(--ol);color:var(--od)}
+.tg-1many{background:var(--pl);color:var(--purple)}
+.tg-many1{background:var(--pkl);color:var(--pink)}
+.tg-rule{background:var(--al);color:var(--amber)}
+.tg-manual{background:var(--pl);color:var(--purple)}
+.tg-sug{background:var(--gl);color:var(--green)}
+.tg-info{background:var(--bl);color:var(--blue)}
+.tg-new{background:var(--al);color:var(--amber);border:1.5px dashed var(--amber)}
 .grids-area{position:relative}
-.loading-ov{display:none;position:absolute;inset:0;background:rgba(255,255,255,.93);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:14px;border-radius:14px;backdrop-filter:blur(2px)}
+.loading-ov{display:none;position:absolute;inset:0;background:rgba(255,255,255,.94);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;border-radius:12px;backdrop-filter:blur(3px)}
 .loading-ov.on{display:flex}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
+.spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .65s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-txt{font-size:13px;color:var(--muted);font-weight:600}
-.loading-sub{font-size:11px;color:var(--subtle);font-weight:500}
-
-.grid-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.grid-scroll{overflow:auto;max-height:calc(100vh - 280px)}
-
-/* ── Unified table ── */
+.l-txt{font-size:13px;color:var(--ink2);font-weight:700}
+.l-sub{font-size:11px;color:var(--muted)}
+.grid-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.grid-scroll{overflow:auto;max-height:calc(100vh - 310px)}
 table.ut{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
-table.ut thead tr.sec-hdr th{padding:9px 12px;background:var(--black);color:rgba(255,255,255,.55);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:0;position:sticky;top:0;z-index:3}
-table.ut thead tr.sec-hdr th.bank-sec,
-table.ut thead tr.sec-hdr th.ldg-sec{color:white}
-table.ut thead tr.sec-hdr th.ctr-sec{background:var(--black);color:rgba(255,255,255,.3);font-size:9px;text-align:center;width:96px;border-left:1px solid #334155;border-right:1px solid #334155}
-table.ut thead tr.col-hdr th{position:sticky;top:34px;background:#f8fafc;padding:7px 10px;text-align:left;font-weight:600;color:var(--muted);border-bottom:1.5px solid var(--border);white-space:nowrap;font-size:10px;z-index:2}
-table.ut thead tr.col-hdr th.chk-col{width:34px;padding-left:12px}
-table.ut thead tr.col-hdr th.ctr-col{background:#f8fafc;border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);width:96px;text-align:center}
-table.ut tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
+table.ut thead tr.sec th{padding:8px 12px;background:var(--black);color:rgba(255,255,255,.5);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;position:sticky;top:0;z-index:4;border-bottom:0}
+table.ut thead tr.sec th.s-bank,table.ut thead tr.sec th.s-ldg{color:#fff}
+table.ut thead tr.sec th.s-ctr{background:var(--black);color:rgba(255,255,255,.25);width:88px;text-align:center;border-left:1px solid #1e293b;border-right:1px solid #1e293b}
+table.ut thead tr.col th{position:sticky;top:32px;background:#f8fafc;padding:6px 10px;text-align:left;font-weight:600;color:var(--muted);border-bottom:1.5px solid var(--border);white-space:nowrap;font-size:10px;z-index:3}
+table.ut thead tr.col th.chk{width:32px;padding-left:12px}
+table.ut thead tr.col th.ctr{background:#f8fafc;border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);width:88px;text-align:center}
+table.ut tbody tr{border-bottom:1px solid #f1f5f9;transition:background .08s}
 table.ut tbody tr:hover{background:#fafafa}
-table.ut tbody tr.sel-row{background:var(--orange-light)!important}
-table.ut tbody td{padding:8px 10px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-table.ut tbody td.chk-col{padding-left:12px;width:34px}
+table.ut tbody tr.sel{background:var(--ol)!important}
+table.ut tbody td{padding:8px 10px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+table.ut tbody td.chk{padding-left:12px;width:32px}
 table.ut tbody td.amt{font-weight:700;color:var(--black);font-variant-numeric:tabular-nums}
-table.ut tbody td.muted{color:var(--subtle);font-size:11px}
-table.ut tbody td.ctr-td{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);text-align:center;background:#fafbfc;width:96px;vertical-align:middle;line-height:1.6}
-/* group separator */
-table.ut tbody tr.gsep td{padding:6px 12px;font-size:10px;font-weight:700;color:white;background:var(--ink2);text-transform:uppercase;letter-spacing:.06em;border:none}
-table.ut tbody tr.gsep td.ctr-td{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);background:var(--ink2)}
-/* group footer */
-table.ut tbody tr.gfoot td{padding:6px 10px;background:#f8fafc;border-top:1px solid var(--border);border-bottom:2px solid var(--border)}
-table.ut tbody tr.gfoot td.ctr-td{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);background:#f8fafc}
-/* editable cell */
-.edit-cell{background:transparent;border:none;font-size:12px;font-family:inherit;color:var(--ink2);width:100%;min-width:60px;outline:none}
-.edit-cell:focus{background:white;border:1.5px solid var(--orange);border-radius:5px;padding:2px 5px;color:var(--black)}
-table.ut tbody td.editable{cursor:text}
-table.ut tbody td.editable:hover{background:rgba(249,115,22,.04)}
-
+table.ut tbody td.dim{color:var(--subtle);font-size:11px}
+table.ut tbody td.ctr{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);text-align:center;background:#fafbfc;width:88px;line-height:1.6;padding:6px 4px}
+table.ut tbody tr.gh td{padding:8px 12px;background:#f8fafc;border-top:2px solid var(--border);border-bottom:1px solid var(--border)}
+table.ut tbody tr.gh td.ctr{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);background:#f8fafc}
+table.ut tbody tr.gf td{padding:6px 10px;background:#fafcff;border-top:1px dashed var(--border);border-bottom:2px solid var(--border)}
+table.ut tbody tr.gf td.ctr{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);background:#fafcff}
+table.ut tbody td.ed{cursor:text}
+table.ut tbody td.ed:hover{background:rgba(249,115,22,.04)}
+.prop{background:repeating-linear-gradient(135deg,#fffbeb,#fffbeb 5px,#fff8e1 5px,#fff8e1 10px);font-style:italic}
 input[type=checkbox]{width:13px;height:13px;cursor:pointer;accent-color:var(--orange)}
-
-/* ── Matched view ── */
-.matched-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.matched-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
 table.mt{width:100%;border-collapse:collapse;font-size:12px}
-table.mt thead th{background:var(--black);padding:9px 14px;text-align:left;font-weight:700;color:rgba(255,255,255,.6);font-size:10px;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+table.mt thead th{background:var(--black);padding:8px 14px;text-align:left;font-weight:700;color:rgba(255,255,255,.55);font-size:9px;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
 table.mt tbody tr{border-bottom:1px solid #f1f5f9}
 table.mt tbody tr:hover{background:#f8fafc}
 table.mt td{padding:9px 14px;color:var(--ink2);vertical-align:top}
 .pl{display:flex;flex-direction:column;gap:2px}
 .pl strong{color:var(--black)}
-.pl span{color:var(--subtle);font-size:11px}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--subtle);gap:10px}
-.empty svg{width:44px;height:44px;opacity:.2}
-.empty p{font-size:13px;font-weight:500}
-
-/* ── Modal ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100;align-items:flex-start;justify-content:center;padding-top:50px;backdrop-filter:blur(3px)}
+.pl span{color:var(--subtle);font-size:10px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px;color:var(--subtle);gap:10px}
+.empty svg{width:40px;height:40px;opacity:.2}
+.empty p{font-size:12px;font-weight:500}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100;align-items:flex-start;justify-content:center;padding-top:48px;backdrop-filter:blur(3px)}
 .modal-bg.on{display:flex}
-.modal{background:var(--surface);border-radius:14px;width:860px;max-width:95vw;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.22);border:1px solid var(--border)}
-.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--black)}
-.modal-title{font-size:14px;font-weight:700;color:white;display:flex;align-items:center;gap:8px}
+.modal{background:var(--surface);border-radius:14px;width:860px;max-width:95vw;max-height:86vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);border:1px solid var(--border)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--black)}
+.modal-title{font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:7px}
 .modal-title svg{color:var(--orange)}
-.modal-x{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.5);font-size:17px;border:none;background:rgba(255,255,255,.08);transition:all .15s}
-.modal-x:hover{background:rgba(255,255,255,.15);color:white}
-.modal-body{padding:18px;overflow-y:auto;flex:1}
-
+.modal-x{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:5px;cursor:pointer;color:rgba(255,255,255,.4);font-size:16px;border:none;background:rgba(255,255,255,.08);transition:all .12s}
+.modal-x:hover{background:rgba(255,255,255,.15);color:#fff}
+.modal-body{padding:16px;overflow-y:auto;flex:1}
 table.rlt{width:100%;border-collapse:collapse;font-size:12px}
-table.rlt th{background:#f8fafc;padding:8px 10px;text-align:left;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);font-size:10px}
-table.rlt td{padding:8px 10px;border-bottom:1px solid #f1f5f9;color:var(--ink2)}
+table.rlt th{background:#f8fafc;padding:7px 10px;text-align:left;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);font-size:10px}
+table.rlt td{padding:7px 10px;border-bottom:1px solid #f1f5f9;color:var(--ink2)}
 table.rlt tr:hover td{background:#f8fafc}
-.arrow{color:var(--orange);font-weight:800;font-size:18px;padding:0 6px}
-
-.rule-form{display:none;margin-top:12px;padding:16px;background:var(--orange-light);border:1.5px solid var(--orange-mid);border-radius:11px}
+.r-arrow{color:var(--orange);font-weight:800;font-size:18px;text-align:center}
+.rule-form{display:none;margin-top:10px;padding:14px;background:var(--ol);border:1.5px solid var(--om);border-radius:10px}
 .rule-form.on{display:block}
-.rf-cols{display:grid;grid-template-columns:1fr 36px 1fr;gap:14px;align-items:start}
-.rf-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.fg{display:flex;flex-direction:column;gap:4px}
+.rf-cols{display:grid;grid-template-columns:1fr 28px 1fr;gap:12px;align-items:start}
+.rf-fields{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.fg{display:flex;flex-direction:column;gap:3px}
 .fg label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.fg input,.fg select{padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;background:white;transition:border-color .15s;color:var(--ink)}
+.fg input,.fg select{padding:6px 9px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;background:#fff;transition:border-color .12s;color:var(--ink)}
 .fg input:focus,.fg select:focus{outline:none;border-color:var(--orange)}
-.sec-title{font-size:10px;font-weight:700;color:var(--orange-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
-.rf-arrow{display:flex;align-items:center;justify-content:center;padding-top:22px;font-size:22px;color:var(--orange)}
-
-/* ── Flying window ── */
-.fly{display:none;position:fixed;right:20px;bottom:20px;width:320px;background:var(--surface);border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.18);border:1.5px solid var(--border);z-index:50;flex-direction:column;overflow:hidden}
+.sec-ttl{font-size:9px;font-weight:700;color:var(--od);margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em}
+.rf-arr{display:flex;align-items:center;justify-content:center;padding-top:20px;font-size:22px;color:var(--orange)}
+.fly{display:none;position:fixed;right:18px;bottom:18px;width:300px;background:var(--surface);border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.16);border:1.5px solid var(--border);z-index:50;flex-direction:column;overflow:hidden}
 .fly.on{display:flex}
-.fly-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--black)}
-.fly-title{font-size:13px;font-weight:700;color:white}
-.fly-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
-.fly-x{width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:5px;cursor:pointer;font-size:16px;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);transition:all .15s}
-.fly-x:hover{background:rgba(255,255,255,.2);color:white}
-.fly-body{padding:16px;display:flex;flex-direction:column;gap:10px}
-.fly-foot{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;background:#f8fafc}
-
-/* ── Toast ── */
-.toast-wrap{position:fixed;top:14px;right:14px;z-index:200;display:flex;flex-direction:column;gap:7px}
-.toast{padding:11px 16px;border-radius:9px;font-size:12px;font-weight:600;color:white;box-shadow:0 4px 20px rgba(0,0,0,.18);animation:tin .2s ease;display:flex;align-items:center;gap:7px;font-family:inherit}
-.toast.green{background:var(--green)}
-.toast.blue{background:var(--black)}
-@keyframes tin{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+.fly-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--black)}
+.fly-title{font-size:12px;font-weight:700;color:#fff}
+.fly-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+.fly-x{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:5px;cursor:pointer;font-size:14px;border:none;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);transition:all .12s}
+.fly-x:hover{background:rgba(255,255,255,.2);color:#fff}
+.fly-body{padding:14px;display:flex;flex-direction:column;gap:9px}
+.fly-foot{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end;background:#f8fafc}
+.toast-wrap{position:fixed;top:12px;right:12px;z-index:200;display:flex;flex-direction:column;gap:6px}
+.toast{padding:10px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;box-shadow:0 3px 16px rgba(0,0,0,.16);animation:tin .18s ease;display:flex;align-items:center;gap:6px;font-family:inherit}
+.toast.green{background:var(--green)}.toast.blue{background:var(--black)}
+@keyframes tin{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
 .hidden{display:none!important}
 </style>
 </head>
 <body>
 
-<!-- Top bar -->
 <div class="topbar">
   <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    </div>
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
     TopBankReco
   </div>
-  <div class="topbar-crumb"><span>Bank Reconciliation</span></div>
-  <div class="topbar-right"><div class="avatar">IT</div></div>
+  <div class="tb-crumb"><b>Bank Reconciliation</b></div>
+  <div class="tb-right"><div class="avatar">IT</div></div>
 </div>
 
 <div class="app">
-  <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Finance</div>
-      <div class="nav-item active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-        Bank Reconciliation
-      </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        General Ledger
-      </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Accounts Payable
-      </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        Accounts Receivable
-      </div>
+    <div style="padding:0 8px;margin-bottom:8px">
+      <div class="s-lbl">Finance</div>
+      <div class="s-item on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Bank Reconciliation</div>
+      <div class="s-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>General Ledger</div>
+      <div class="s-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Accounts Receivable</div>
+      <div class="s-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Accounts Payable</div>
     </div>
-    <div class="nav-divider"></div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Reports</div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        Analytics
-      </div>
+    <div class="s-div"></div>
+    <div style="padding:0 8px">
+      <div class="s-lbl">Reports</div>
+      <div class="s-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
+      <div class="s-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</div>
     </div>
-    <div class="nav-divider"></div>
-    <div class="sidebar-section">
-      <div class="sidebar-label">Settings</div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
-        Configuration
-      </div>
+    <div class="s-div"></div>
+    <div style="padding:0 8px">
+      <div class="s-lbl">Settings</div>
+      <div class="s-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>Configuration</div>
     </div>
   </aside>
 
-  <!-- Main content -->
   <main class="main">
-    <div class="page-hdr">
-      <div>
-        <div class="page-title">Bank Reconciliation</div>
-        <div class="page-sub">Match bank transactions against ledger entries</div>
-      </div>
-      <div class="biz-wrap">
+    <div class="ph">
+      <div><div class="ph-title">Bank Reconciliation</div><div class="ph-sub">Match bank transactions against ledger entries</div></div>
+      <div class="biz-row">
         <label>Business</label>
         <select class="biz" onchange="onBizChange(this.value)">
-          <option value="">— Select a business —</option>
+          <option value="">— Select business —</option>
           <option value="acme" selected>Acme Technologies Ltd.</option>
           <option value="sunrise">Sunrise Ventures</option>
           <option value="north">Northgate Holdings</option>
@@ -285,77 +213,59 @@ table.rlt tr:hover td{background:#f8fafc}
     </div>
 
     <div class="tabs">
-      <div class="tab active" id="tab-recon" onclick="switchTab('recon')">Reconciliation <span class="badge" id="bdg-recon">0</span></div>
-      <div class="tab" id="tab-matched" onclick="switchTab('matched')">Matched Items <span class="badge" id="bdg-matched">0</span></div>
+      <div class="tab on" id="tab-recon" onclick="sw('recon')">Reconciliation <span class="bdg" id="bdg-recon">0</span></div>
+      <div class="tab" id="tab-matched" onclick="sw('matched')">Matched Items <span class="bdg" id="bdg-matched">0</span></div>
     </div>
 
-    <!-- RECONCILIATION VIEW -->
     <div id="view-recon">
       <div class="toolbar">
         <button class="btn btn-primary" onclick="runSuggest()" id="btn-suggest">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-          Auto-Suggest
-        </button>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>Auto-Suggest</button>
         <button class="btn btn-outline" onclick="openRules()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
-          Rules
-        </button>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>Rules</button>
         <button class="btn btn-outline" onclick="openFly()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Ledger Item
-        </button>
-        <div class="spacer"></div>
-        <div id="global-bal-area" class="hidden" style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:12px;color:var(--muted);font-weight:500">All groups balanced?</span>
-        </div>
-        <button class="btn btn-success hidden" onclick="matchAll()" id="btn-match-all">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Match All Selected
-        </button>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Ledger Item</button>
       </div>
-
       <div class="bal-bar">
-        <div class="bal-item"><div class="bal-label">Selected Bank</div><div class="bal-val" id="bv-bank">—</div></div>
-        <div class="bal-item"><div class="bal-label">Selected Ledger</div><div class="bal-val" id="bv-ledger">—</div></div>
-        <div class="bal-item"><div class="bal-label">Difference</div><div class="bal-val" id="bv-diff">—</div></div>
-        <div class="bal-status idle" id="bal-status" style="min-height:50px;padding:0 16px">Select rows to validate balance</div>
+        <div class="bal-item"><div class="bal-lbl">Selected Bank</div><div class="bal-val" id="bv-bank">—</div></div>
+        <div class="bal-item"><div class="bal-lbl">Selected Ledger</div><div class="bal-val" id="bv-ledger">—</div></div>
+        <div class="bal-item"><div class="bal-lbl">Difference</div><div class="bal-val" id="bv-diff">—</div></div>
+        <div class="bal-status idle" id="bal-status" style="min-height:48px">Select rows to validate</div>
       </div>
-
       <div class="grids-area">
         <div class="loading-ov" id="loading-ov">
           <div class="spinner"></div>
-          <div class="loading-txt">Running suggestion engine…</div>
-          <div class="loading-sub" id="loading-step">Scanning full parity matches</div>
+          <div class="l-txt">Running suggestion engine…</div>
+          <div class="l-sub" id="l-step">Initialising</div>
         </div>
-        <div class="grid-wrap">
+        <div class="grid-card">
           <div class="grid-scroll">
             <table class="ut">
               <thead>
-                <tr class="sec-hdr">
-                  <th class="bank-sec" colspan="8">🏦 Bank Lines &nbsp;<span style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700" id="cnt-bank">0</span></th>
-                  <th class="ctr-sec">Match</th>
-                  <th class="ldg-sec" colspan="7">📄 Ledger Items &nbsp;<span style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700" id="cnt-ledger">0</span></th>
+                <tr class="sec">
+                  <th class="s-bank" colspan="8">🏦 Bank Lines <span style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border-radius:12px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px" id="cnt-b">0</span></th>
+                  <th class="s-ctr">Match</th>
+                  <th class="s-ldg" colspan="7">📄 Ledger Items <span style="background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);border-radius:12px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px" id="cnt-l">0</span></th>
                 </tr>
-                <tr class="col-hdr">
-                  <th class="chk-col"><input type="checkbox" id="chk-bank-all" onchange="selAll('bank',this.checked)"></th>
+                <tr class="col">
+                  <th class="chk"><input type="checkbox" onchange="selAll('bank',this.checked)"></th>
                   <th>Date</th><th>Amount</th><th>Cur.</th><th>Category</th><th>Description</th><th>Bank</th><th>Account</th>
-                  <th class="ctr-col"></th>
+                  <th class="ctr"></th>
                   <th>Date</th><th>Amount</th><th>Cur.</th><th>Category</th><th>Description</th><th>Account</th>
-                  <th class="chk-col"><input type="checkbox" id="chk-ldg-all" onchange="selAll('ledger',this.checked)"></th>
+                  <th class="chk"><input type="checkbox" onchange="selAll('ledger',this.checked)"></th>
                 </tr>
               </thead>
-              <tbody id="unified-body"></tbody>
+              <tbody id="tbody"></tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MATCHED VIEW -->
     <div id="view-matched" class="hidden">
-      <div class="matched-wrap">
+      <div class="matched-card">
         <table class="mt">
-          <thead><tr><th>#</th><th>Matched On</th><th>Bank Line(s)</th><th>Ledger Item(s)</th><th>Amount</th><th>Type</th><th>Match Kind</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Date</th><th>Bank Line(s)</th><th>Ledger Item(s)</th><th>Amount</th><th>How</th><th>Kind</th><th></th></tr></thead>
           <tbody id="matched-body"></tbody>
         </table>
       </div>
@@ -365,58 +275,50 @@ table.rlt tr:hover td{background:#f8fafc}
 
 <!-- RULES MODAL -->
 <div class="modal-bg" id="rules-modal">
-  <div class="modal" style="width:900px">
+  <div class="modal">
     <div class="modal-hdr">
       <div class="modal-title">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
         Rule Engine
       </div>
       <button class="modal-x" onclick="closeRules()">×</button>
     </div>
     <div class="modal-body">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <p style="font-size:12px;color:var(--muted)">Rules create synthetic ledger items for bank lines with no match. Processed after all parity checks.</p>
-        <button class="btn btn-primary btn-sm" onclick="toggleRuleForm()">+ New Rule</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <p style="font-size:11px;color:var(--muted)">Rules auto-create ledger items for unmatched bank lines. Applied after all parity checks.</p>
+        <button class="btn btn-primary btn-sm" onclick="toggleRF()">+ New Rule</button>
       </div>
       <div class="rule-form" id="rule-form">
         <div class="rf-cols">
           <div>
-            <div class="sec-title">When bank line matches…</div>
+            <div class="sec-ttl">When bank line matches…</div>
             <div class="rf-fields">
-              <div class="fg"><label>Description contains</label><input id="rf-bdesc" placeholder="e.g. ADOBE, PAYROLL"></div>
-              <div class="fg"><label>Category</label>
-                <select id="rf-bcat"><option value="">Any</option><option>Software</option><option>Utilities</option><option>Travel</option><option>Meals</option><option>Insurance</option><option>Telecoms</option><option>Payroll</option><option>Revenue</option></select>
-              </div>
-              <div class="fg"><label>Transaction Type</label>
-                <select id="rf-txtype"><option value="">Any</option><option value="debit">Debit</option><option value="credit">Credit</option></select>
-              </div>
-              <div class="fg"><label>Payment Rail</label>
-                <select id="rf-rail"><option value="">Any</option><option>Wire</option><option>ACH</option><option>Card</option><option>Check</option><option>Direct Debit</option></select>
-              </div>
-              <div class="fg"><label>Amount Min</label><input id="rf-amin" type="number" placeholder="0"></div>
-              <div class="fg"><label>Amount Max</label><input id="rf-amax" type="number" placeholder="∞"></div>
-              <div class="fg"><label>Bank Account</label><input id="rf-bacc" placeholder="e.g. IL-123-4567"></div>
-              <div class="fg"><label>Merchant Code</label><input id="rf-mcc" placeholder="e.g. 5411"></div>
+              <div class="fg"><label>Description contains</label><input id="rf-bdesc" placeholder="e.g. ADOBE"></div>
+              <div class="fg"><label>Category</label><select id="rf-bcat"><option value="">Any</option><option>Software</option><option>Utilities</option><option>Travel</option><option>Insurance</option><option>Telecoms</option><option>Payroll</option><option>Revenue</option></select></div>
+              <div class="fg"><label>Transaction type</label><select id="rf-tx"><option value="">Any</option><option value="debit">Debit</option><option value="credit">Credit</option></select></div>
+              <div class="fg"><label>Payment rail</label><select id="rf-rail"><option value="">Any</option><option>Wire</option><option>ACH</option><option>Card</option><option>Check</option><option>Direct Debit</option></select></div>
+              <div class="fg"><label>Amount min</label><input id="rf-amin" type="number" placeholder="0"></div>
+              <div class="fg"><label>Amount max</label><input id="rf-amax" type="number" placeholder="unlimited"></div>
+              <div class="fg"><label>Bank account</label><input id="rf-bacc" placeholder="e.g. IL-123-4567"></div>
+              <div class="fg"><label>Merchant code</label><input id="rf-mcc" placeholder="e.g. 5411"></div>
             </div>
           </div>
-          <div class="rf-arrow">→</div>
+          <div class="rf-arr">→</div>
           <div>
-            <div class="sec-title">Create ledger item with…</div>
-            <div class="rf-fields">
-              <div class="fg" style="grid-column:1/-1"><label>Description</label><input id="rf-ldesc" placeholder="e.g. Monthly software subscription"></div>
-              <div class="fg" style="grid-column:1/-1"><label>Category</label>
-                <select id="rf-lcat"><option value="">Same as bank</option><option>Operating Expenses</option><option>Software Licenses</option><option>Utilities</option><option>Travel &amp; Entertainment</option><option>Insurance</option><option>Communications</option><option>Salaries</option><option>Revenue</option></select>
-              </div>
+            <div class="sec-ttl">Create ledger item with…</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div class="fg"><label>Description</label><input id="rf-ldesc" placeholder="e.g. Monthly software subscription"></div>
+              <div class="fg"><label>Category</label><select id="rf-lcat"><option value="">Same as bank</option><option>Operating Expenses</option><option>Software Licenses</option><option>Utilities</option><option>Travel &amp; Entertainment</option><option>Insurance</option><option>Communications</option><option>Salaries</option><option>Revenue</option></select></div>
             </div>
           </div>
         </div>
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-          <button class="btn btn-outline btn-sm" onclick="toggleRuleForm()">Cancel</button>
+        <div style="display:flex;justify-content:flex-end;gap:7px;margin-top:10px">
+          <button class="btn btn-outline btn-sm" onclick="toggleRF()">Cancel</button>
           <button class="btn btn-primary btn-sm" onclick="saveRule()">Save Rule</button>
         </div>
       </div>
       <table class="rlt">
-        <thead><tr><th>Description</th><th>Category</th><th>Type</th><th>Amount Range</th><th>Account</th><th></th><th>Ledger Desc</th><th>Ledger Cat</th><th></th></tr></thead>
+        <thead><tr><th>Description</th><th>Category</th><th>Type</th><th>Amount</th><th>Account</th><th class="r-arrow"></th><th>Ledger Desc</th><th>Ledger Cat</th><th></th></tr></thead>
         <tbody id="rules-body"></tbody>
       </table>
     </div>
@@ -430,10 +332,8 @@ table.rlt tr:hover td{background:#f8fafc}
     <button class="fly-x" onclick="closeFly()">×</button>
   </div>
   <div class="fly-body">
-    <div class="fg"><label>Amount</label><input type="number" id="fly-amt" placeholder="0.00" style="font-size:15px;font-weight:700"></div>
-    <div class="fg"><label>Category</label>
-      <select id="fly-cat"><option>Operating Expenses</option><option>Software Licenses</option><option>Utilities</option><option>Travel &amp; Entertainment</option><option>Insurance</option><option>Communications</option><option>Salaries</option><option>Revenue</option><option>Rent</option><option>Other</option></select>
-    </div>
+    <div class="fg"><label>Amount</label><input type="number" id="fly-amt" style="font-size:15px;font-weight:700"></div>
+    <div class="fg"><label>Category</label><select id="fly-cat"><option>Operating Expenses</option><option>Software Licenses</option><option>Utilities</option><option>Travel &amp; Entertainment</option><option>Insurance</option><option>Communications</option><option>Salaries</option><option>Revenue</option><option>Rent</option><option>Other</option></select></div>
     <div class="fg"><label>Description / Notes</label><input type="text" id="fly-notes" placeholder="Description or notes"></div>
     <div class="fg"><label>Date</label><input type="date" id="fly-date"></div>
   </div>
@@ -446,461 +346,379 @@ table.rlt tr:hover td{background:#f8fafc}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// ── Data ──────────────────────────────────────────────────────────────────────
-let bankLines = [
-  {id:'b1', date:'2024-05-01', amount:1500,  cur:'ILS', cat:'Office Supplies', desc:'STAPLES STORE',      bank:'Bank Leumi',    acc:'IL-123-4567', chk:false},
-  {id:'b2', date:'2024-05-02', amount:8050,  cur:'ILS', cat:'Payroll',         desc:'SALARY PROCESSING',  bank:'Bank Hapoalim', acc:'IL-456-7890', chk:false},
-  {id:'b3', date:'2024-05-03', amount:252,   cur:'ILS', cat:'Utilities',       desc:'MUNICIPAL POWER',    bank:'Bank Leumi',    acc:'IL-123-4567', chk:false},
-  {id:'b4', date:'2024-05-05', amount:5000,  cur:'ILS', cat:'Consulting',      desc:'CONSULTANCY SVC',    bank:'Bank Leumi',    acc:'IL-123-4567', chk:false},
-  {id:'b5', date:'2024-05-06', amount:1100,  cur:'ILS', cat:'Travel',          desc:'EL AL FLIGHTS',      bank:'Bank Leumi',    acc:'IL-123-4567', chk:false},
-  {id:'b6', date:'2024-05-06', amount:400,   cur:'ILS', cat:'Travel',          desc:'GETT TAXI',          bank:'Bank Hapoalim', acc:'IL-456-7890', chk:false},
-  {id:'b7', date:'2024-05-08', amount:620,   cur:'ILS', cat:'Software',        desc:'ADOBE INC',          bank:'Bank Hapoalim', acc:'IL-456-7890', chk:false},
-  {id:'b8', date:'2024-05-10', amount:800,   cur:'ILS', cat:'Insurance',       desc:'MIGDAL INSURANCE',   bank:'Bank Leumi',    acc:'IL-123-4567', chk:false},
-  {id:'b9', date:'2024-05-12', amount:480,   cur:'ILS', cat:'Software',        desc:'AMAZON AWS',         bank:'Bank Leumi',    acc:'IL-123-4567', chk:false},
-  {id:'b10',date:'2024-05-14', amount:220,   cur:'ILS', cat:'Transport',       desc:'FUEL STATION',       bank:'Bank Hapoalim', acc:'IL-456-7890', chk:false},
+let bankLines=[
+  {id:'b1',date:'2024-05-01',amount:1500,cur:'ILS',cat:'Office Supplies',desc:'STAPLES STORE',    bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b2',date:'2024-05-02',amount:8000,cur:'ILS',cat:'Payroll',        desc:'SALARY PROCESSING',bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
+  {id:'b3',date:'2024-05-03',amount:250, cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',  bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b4',date:'2024-05-05',amount:5000,cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',  bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b5',date:'2024-05-06',amount:1100,cur:'ILS',cat:'Travel',         desc:'EL AL FLIGHTS',    bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b6',date:'2024-05-06',amount:400, cur:'ILS',cat:'Travel',         desc:'GETT TAXI',        bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
+  {id:'b7',date:'2024-05-08',amount:620, cur:'ILS',cat:'Software',       desc:'ADOBE INC',        bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
+  {id:'b8',date:'2024-05-10',amount:800, cur:'ILS',cat:'Insurance',      desc:'MIGDAL INSURANCE', bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b9',date:'2024-05-12',amount:480, cur:'ILS',cat:'Software',       desc:'AMAZON AWS',       bank:'Bank Leumi',   acc:'IL-123-4567',chk:false},
+  {id:'b10',date:'2024-05-14',amount:220,cur:'ILS',cat:'Transport',      desc:'FUEL STATION',     bank:'Bank Hapoalim',acc:'IL-456-7890',chk:false},
 ];
-let ledgerItems = [
-  {id:'l1', date:'2024-05-01', amount:1500,  cur:'ILS', cat:'Office Expenses',   desc:'Stationery purchase',          acc:'EXP-001', chk:false},
-  {id:'l2', date:'2024-05-02', amount:8000,  cur:'ILS', cat:'Salaries',          desc:'May salary disbursement',               acc:'SAL-001', chk:false},
-  {id:'l3', date:'2024-05-03', amount:250,   cur:'ILS', cat:'Utilities',         desc:'Electricity bill May',         acc:'UTL-001', chk:false},
-  {id:'l4', date:'2024-05-05', amount:3000,  cur:'ILS', cat:'Consulting',        desc:'Consultant fee – part 1',      acc:'CST-001', chk:false},
-  {id:'l5', date:'2024-05-05', amount:2000,  cur:'ILS', cat:'Consulting',        desc:'Consultant fee – part 2',      acc:'CST-001', chk:false},
-  {id:'l6', date:'2024-05-07', amount:1500,  cur:'ILS', cat:'Travel',            desc:'Travel expenses – conference', acc:'TRV-001', chk:false},
-  {id:'l7', date:'2024-04-30', amount:2200,  cur:'ILS', cat:'Consulting',        desc:'External consultant fee',      acc:'EXP-002', chk:false},
-  {id:'l8', date:'2024-05-09', amount:680,   cur:'ILS', cat:'Marketing',         desc:'Social media campaign',        acc:'MKT-001', chk:false},
+let ledgerItems=[
+  {id:'l1',date:'2024-05-01',amount:1500,cur:'ILS',cat:'Office Expenses',  desc:'Stationery purchase',       acc:'EXP-001',chk:false},
+  {id:'l2',date:'2024-05-04',amount:8000,cur:'ILS',cat:'Salaries',         desc:'May salary disbursement',   acc:'SAL-001',chk:false},
+  {id:'l3',date:'2024-05-05',amount:250, cur:'ILS',cat:'Utilities',        desc:'Electricity bill May',      acc:'UTL-001',chk:false},
+  {id:'l4',date:'2024-05-05',amount:3000,cur:'ILS',cat:'Consulting',       desc:'Consultant fee – part 1',   acc:'CST-001',chk:false},
+  {id:'l5',date:'2024-05-05',amount:2000,cur:'ILS',cat:'Consulting',       desc:'Consultant fee – part 2',   acc:'CST-001',chk:false},
+  {id:'l6',date:'2024-05-07',amount:1500,cur:'ILS',cat:'Travel',           desc:'Conference travel expenses',acc:'TRV-001',chk:false},
+  {id:'l7',date:'2024-04-30',amount:2200,cur:'ILS',cat:'Consulting',       desc:'External consultant fee',   acc:'EXP-002',chk:false},
+  {id:'l8',date:'2024-05-09',amount:680, cur:'ILS',cat:'Marketing',        desc:'Social media campaign',     acc:'MKT-001',chk:false},
 ];
-let rules = [
-  {id:'r1', bdesc:'ADOBE',  bcat:'Software',  txtype:'debit', amin:'',    amax:'',    bacc:'',              rail:'',    mcc:'', ldesc:'Adobe CC subscription',   lcat:'Software Licenses'},
-  {id:'r2', bdesc:'MIGDAL', bcat:'Insurance', txtype:'debit', amin:'500', amax:'1200',bacc:'IL-123-4567',   rail:'',    mcc:'', ldesc:'Insurance premium',        lcat:'Insurance'},
-  {id:'r3', bdesc:'PAYROLL',bcat:'Payroll',   txtype:'',      amin:'',    amax:'',    bacc:'',              rail:'ACH', mcc:'', ldesc:'Monthly payroll run',       lcat:'Salaries'},
+let rules=[
+  {id:'r1',bdesc:'ADOBE', bcat:'Software', tx:'debit',rail:'',  amin:'',   amax:'',   bacc:'',           mcc:'',ldesc:'Adobe CC subscription', lcat:'Software Licenses'},
+  {id:'r2',bdesc:'MIGDAL',bcat:'Insurance',tx:'debit',rail:'',  amin:'500',amax:'1200',bacc:'IL-123-4567',mcc:'',ldesc:'Insurance premium',      lcat:'Insurance'},
 ];
-let matched = [], suggestionGroups = [], matchCounter = 0, suggestDone = false;
+let matched=[],suggGroups=[],matchCounter=0,sugDone=false;
 
-// ── Utils ─────────────────────────────────────────────────────────────────────
-const fmt = n => '₪ ' + new Intl.NumberFormat('en-IL').format(n);
-const dayDiff = (a,b) => Math.abs(new Date(a)-new Date(b))/864e5;
+const fmt=n=>'₪ '+new Intl.NumberFormat('en-IL').format(n);
+const dayDiff=(a,b)=>Math.abs(new Date(a)-new Date(b))/864e5;
+function toast(msg,type='green'){const w=document.getElementById('toasts'),t=document.createElement('div');t.className='toast '+type;t.textContent=msg;w.appendChild(t);setTimeout(()=>t.remove(),3200);}
 
-function toast(msg, type='green') {
-  const c = document.getElementById('toasts');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
-  setTimeout(() => t.remove(), 3400);
-}
-
-// ── Render ────────────────────────────────────────────────────────────────────
-const GROUP_META = {
-  'full':   {cls:'tag-full',  label:'1:1 Full Parity',   emoji:'✦'},
-  'ftxt':   {cls:'tag-ftxt',  label:'1:1 Fuzzy Text',    emoji:'≈'},
-  'famt':   {cls:'tag-famt',  label:'1:1 Fuzzy Amount',  emoji:'~'},
-  '1many':  {cls:'tag-1many', label:'1 : Many',          emoji:'1→N'},
-  'many1':  {cls:'tag-many1', label:'Many : 1',          emoji:'N→1'},
-  'rule':   {cls:'tag-rule',  label:'Rule-Based',        emoji:'⚙'},
+const GM={
+  full: {cls:'tg-full', icon:'✦',  label:'1:1 Full Parity'},
+  ftxt: {cls:'tg-ftxt', icon:'≈',  label:'1:1 Fuzzy Text'},
+  famt: {cls:'tg-famt', icon:'~',  label:'1:1 Fuzzy Amount'},
+  '1many':{cls:'tg-1many',icon:'1→N',label:'1 : Many'},
+  many1:{cls:'tg-many1',icon:'N→1',label:'Many : 1'},
+  rule: {cls:'tg-rule', icon:'⚙',  label:'Rule-Based'},
 };
 
-function render() {
-  const body = document.getElementById('unified-body');
-  body.innerHTML = '';
-
-  if (!suggestDone) {
-    const maxLen = Math.max(bankLines.length, ledgerItems.length);
-    for (let i = 0; i < maxLen; i++)
-      body.appendChild(mkRow(bankLines[i]||null, ledgerItems[i]||null, null, null, 0));
+function render(){
+  const body=document.getElementById('tbody');
+  body.innerHTML='';
+  if(!sugDone){
+    const mx=Math.max(bankLines.length,ledgerItems.length);
+    for(let i=0;i<mx;i++) body.appendChild(mkRow(bankLines[i]||null,ledgerItems[i]||null,null,null,false));
   } else {
-    // Collect matched IDs
-    const usedB = new Set(suggestionGroups.flatMap(g=>g.bankIds));
-    const usedL = new Set(suggestionGroups.flatMap(g=>g.ledgerIds));
-
-    // Render suggestion groups
-    suggestionGroups.forEach((g,gi) => {
-      const meta = GROUP_META[g.type];
-      const bItems = g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
-      const lItems = g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
-      const sumB = bItems.reduce((a,x)=>a+x.amount,0);
-      const sumL = lItems.reduce((a,x)=>a+x.amount,0);
-
-      // Group header row
-      const sep = document.createElement('tr'); sep.className='gsep';
-      sep.innerHTML=`<td colspan="8" style="padding-left:14px">
-        <span class="tag ${meta.cls}" style="margin-right:8px">${meta.emoji} ${meta.label}</span>
-        <span style="font-weight:500;opacity:.7">${bItems.length} bank · ${lItems.length} ledger</span>
-      </td><td class="ctr-td"></td><td colspan="7"></td>`;
-      body.appendChild(sep);
-
-      // Paired rows
-      const rows = Math.max(bItems.length, lItems.length);
-      for (let i=0; i<rows; i++) {
-        const showTag = i===0;
-        body.appendChild(mkRow(bItems[i]||null, lItems[i]||null,
-          showTag ? g.type : '__cont', g.ruleCat||null, gi));
-      }
-
-      // Group footer: balance + match button
-      const balanced = Math.abs(sumB-sumL)<0.01 && bItems.length && lItems.length;
-      const foot = document.createElement('tr'); foot.className='gfoot';
-      foot.innerHTML=`
-        <td colspan="4" style="color:var(--muted);font-size:11px">
-          Bank: <strong>${sumB?fmt(sumB):'—'}</strong> &nbsp;·&nbsp; Ledger: <strong>${sumL?fmt(sumL):'—'}</strong>
-          &nbsp;·&nbsp; Diff: <strong style="color:${balanced?'var(--green)':'var(--red)'}">
-          ${balanced?'₪ 0':fmt(Math.abs(sumB-sumL))}</strong>
-        </td>
-        <td colspan="4" style="text-align:right">
-          <button class="btn btn-success btn-sm" ${!balanced?'disabled':''} onclick="matchGroup(${gi})">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Match Group
+    const usedB=new Set(suggGroups.flatMap(g=>g.bankIds));
+    const usedL=new Set(suggGroups.flatMap(g=>g.ledgerIds||[]));
+    suggGroups.forEach((g,gi)=>{
+      const meta=GM[g.type],isR=g.type==='rule';
+      const bItems=g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
+      const lItems=isR?(g.proposedLedgers||[]):g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
+      const sumB=bItems.reduce((a,x)=>a+x.amount,0),sumL=lItems.reduce((a,x)=>a+x.amount,0),diff=Math.abs(sumB-sumL);
+      // group header
+      const hr=document.createElement('tr');hr.className='gh';
+      hr.innerHTML=`<td colspan="8" style="padding:8px 12px">
+        <span class="tag ${meta.cls}" style="font-size:11px;padding:3px 10px;margin-right:8px">${meta.icon} ${meta.label}</span>
+        <span style="font-size:11px;color:var(--muted);font-weight:500">${bItems.length} bank · ${lItems.length} ledger${isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>':''}</span>
+      </td><td class="ctr"></td><td colspan="7"></td>`;
+      body.appendChild(hr);
+      // rows
+      const rc=Math.max(bItems.length,lItems.length);
+      for(let i=0;i<rc;i++) body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,i===0?g.type:'__cont',isR?(g.ruleCats&&g.ruleCats[i]):null,isR));
+      // footer
+      const fr=document.createElement('tr');fr.className='gf';
+      let bh;
+      if(isR) bh=`<span style="color:var(--green);font-weight:700;font-size:11px">✓ Balanced on confirm</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> = Proposed: <b>${fmt(sumL)}</b></span>`;
+      else if(diff<0.01) bh=`<span style="color:var(--green);font-weight:700;font-size:11px">✓ Balanced</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> = Ledger: <b>${fmt(sumL)}</b></span>`;
+      else bh=`<span style="color:var(--amber);font-weight:700;font-size:11px">≈ ${fmt(diff)} diff</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> · Ledger: <b>${fmt(sumL)}</b></span>`;
+      fr.innerHTML=`<td colspan="5">${bh}</td>
+        <td colspan="3" style="text-align:right">
+          <button class="btn btn-success btn-sm" onclick="matchGroup(${gi})">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirm Match
           </button>
         </td>
-        <td class="ctr-td"></td>
-        <td colspan="7"></td>`;
-      body.appendChild(foot);
+        <td class="ctr"></td><td colspan="7"></td>`;
+      body.appendChild(fr);
     });
-
-    // Unmatched section
-    const unmB = bankLines.filter(b=>!usedB.has(b.id));
-    const unmL = ledgerItems.filter(l=>!usedL.has(l.id));
-    if (unmB.length||unmL.length) {
-      const sep2=document.createElement('tr'); sep2.className='gsep';
-      sep2.innerHTML=`<td colspan="8" style="padding-left:14px;background:#475569">
-        <span style="opacity:.8">Unmatched &nbsp;·&nbsp; ${unmB.length} bank · ${unmL.length} ledger</span>
-      </td><td class="ctr-td" style="background:#475569"></td><td colspan="7" style="background:#475569"></td>`;
-      body.appendChild(sep2);
-      const maxU=Math.max(unmB.length,unmL.length);
-      for(let i=0;i<maxU;i++) body.appendChild(mkRow(unmB[i]||null,unmL[i]||null,null,null,-1));
+    const unmB=bankLines.filter(b=>!usedB.has(b.id)),unmL=ledgerItems.filter(l=>!usedL.has(l.id));
+    if(unmB.length||unmL.length){
+      const ur=document.createElement('tr');ur.className='gh';
+      ur.innerHTML=`<td colspan="8" style="padding:8px 12px;background:#f1f5f9">
+        <span style="font-size:11px;font-weight:700;color:var(--muted)">Unmatched</span>
+        <span style="font-size:11px;color:var(--subtle);margin-left:8px">${unmB.length} bank · ${unmL.length} ledger — no suggestion found</span>
+      </td><td class="ctr" style="background:#f1f5f9"></td><td colspan="7" style="background:#f1f5f9"></td>`;
+      body.appendChild(ur);
+      const mx=Math.max(unmB.length,unmL.length);
+      for(let i=0;i<mx;i++) body.appendChild(mkRow(unmB[i]||null,unmL[i]||null,null,null,false));
     }
   }
-  document.getElementById('cnt-bank').textContent = bankLines.length;
-  document.getElementById('cnt-ledger').textContent = ledgerItems.length;
-  updateBal();
-  updateBadges();
+  document.getElementById('cnt-b').textContent=bankLines.length;
+  document.getElementById('cnt-l').textContent=ledgerItems.length;
+  updateBal();updateBadges();
 }
 
-function mkRow(b, l, tag, ruleCat, gi) {
-  const tr = document.createElement('tr');
-  if ((b&&b.chk)||(l&&l.chk)) tr.classList.add('sel-row');
-
-  let tagHtml = '';
-  if (tag && tag !== '__cont') {
-    const meta = GROUP_META[tag];
-    if (meta) tagHtml=`<span class="tag ${meta.cls}">${meta.emoji}</span>`;
-    if (tag==='rule'&&ruleCat) tagHtml+=`<br><span style="font-size:9px;color:var(--amber);font-weight:600;display:block;margin-top:3px">${ruleCat}</span>`;
+function mkRow(b,l,tag,ruleCat,isP){
+  const tr=document.createElement('tr');
+  if((b&&b.chk)||(l&&l.chk))tr.classList.add('sel');
+  let ctr='';
+  if(tag&&tag!=='__cont'){
+    const m=GM[tag];
+    if(m) ctr=`<span class="tag ${m.cls}" style="font-size:10px">${m.icon}</span>`;
+    if(isP&&ruleCat) ctr+=`<br><span class="tag tg-new" style="margin-top:2px;font-size:9px">New · ${ruleCat}</span>`;
   }
-
-  const bHtml = b
-    ? `<td class="chk-col"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
-       <td>${b.date}</td><td class="amt">${fmt(b.amount)}</td><td>${b.cur}</td>
-       <td title="${b.cat}">${b.cat}</td><td title="${b.desc}">${b.desc}</td>
-       <td class="muted">${b.bank}</td><td class="muted">${b.acc}</td>`
-    : `<td class="chk-col"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
-
-  const lHtml = l
-    ? `<td contenteditable="true" class="editable" onblur="editField('date','${l.id}',this)">${l.date}</td>
-       <td class="amt editable" contenteditable="true" onblur="editField('amount','${l.id}',this)">${fmt(l.amount)}</td>
-       <td>${l.cur}</td>
-       <td class="editable" contenteditable="true" onblur="editField('cat','${l.id}',this)" title="${l.cat}">${l.cat}</td>
-       <td class="editable" contenteditable="true" onblur="editField('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
-       <td class="muted">${l.acc}</td>
-       <td class="chk-col"><input type="checkbox" ${l.chk?'checked':''} onchange="toggle('ledger','${l.id}',this.checked)"></td>`
-    : `<td></td><td></td><td></td><td></td><td></td><td></td><td class="chk-col"></td>`;
-
-  tr.innerHTML = bHtml + `<td class="ctr-td">${tagHtml}</td>` + lHtml;
+  const bH=b
+    ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
+      <td>${b.date}</td><td class="amt">${fmt(b.amount)}</td><td>${b.cur}</td>
+      <td title="${b.cat}">${b.cat}</td>
+      <td title="${b.desc}"><span style="font-weight:600;color:var(--black)">${b.desc}</span></td>
+      <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
+    :`<td class="chk"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+  let lH;
+  if(l&&isP){
+    lH=`<td class="prop dim">${l.date}</td>
+      <td class="prop" style="font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums">${fmt(l.amount)}</td>
+      <td class="prop dim">${l.cur}</td><td class="prop dim">${l.cat}</td>
+      <td class="prop dim" title="${l.desc}">${l.desc}</td>
+      <td class="prop dim">AUTO</td><td class="chk prop"></td>`;
+  } else if(l){
+    lH=`<td class="ed" contenteditable="true" onblur="editL('date','${l.id}',this)">${l.date}</td>
+      <td class="amt ed" contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmt(l.amount)}</td>
+      <td>${l.cur}</td>
+      <td class="ed" contenteditable="true" onblur="editL('cat','${l.id}',this)">${l.cat}</td>
+      <td class="ed" contenteditable="true" onblur="editL('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
+      <td class="dim">${l.acc}</td>
+      <td class="chk"><input type="checkbox" ${l.chk?'checked':''} onchange="toggle('ledger','${l.id}',this.checked)"></td>`;
+  } else {
+    lH=`<td></td><td></td><td></td><td></td><td></td><td></td><td class="chk"></td>`;
+  }
+  tr.innerHTML=bH+`<td class="ctr">${ctr}</td>`+lH;
   return tr;
 }
 
-// ── Inline edit ───────────────────────────────────────────────────────────────
-function editField(field, id, el) {
-  const l = ledgerItems.find(x=>x.id===id); if(!l) return;
-  const raw = el.textContent.replace(/[₪,\s]/g,'').trim();
-  if (field==='amount') { const n=parseFloat(raw); if(!isNaN(n)){l.amount=n;el.textContent=fmt(n);} }
-  else l[field]=el.textContent.trim();
+function editL(f,id,el){
+  const l=ledgerItems.find(x=>x.id===id);if(!l)return;
+  if(f==='amount'){const n=parseFloat(el.textContent.replace(/[₪,\s]/g,''));if(!isNaN(n)){l.amount=n;el.textContent=fmt(n);}}
+  else l[f]=el.textContent.trim();
   updateBal();
 }
-
-// ── Selection / balance ───────────────────────────────────────────────────────
-function toggle(side, id, chk) {
-  if (side==='bank') bankLines.find(b=>b.id===id).chk=chk;
+function toggle(side,id,chk){
+  if(side==='bank') bankLines.find(b=>b.id===id).chk=chk;
   else ledgerItems.find(l=>l.id===id).chk=chk;
-  const tr=event.target.closest('tr');
-  if(tr) tr.classList.toggle('sel-row',chk);
+  event.target.closest('tr')?.classList.toggle('sel',chk);
   updateBal();
 }
-function selAll(side,chk) {
+function selAll(side,chk){
   if(side==='bank') bankLines.forEach(b=>b.chk=chk);
   else ledgerItems.forEach(l=>l.chk=chk);
   render();
 }
-function updateBal() {
-  const sb=bankLines.filter(b=>b.chk), sl=ledgerItems.filter(l=>l.chk);
+function updateBal(){
+  const sb=bankLines.filter(b=>b.chk),sl=ledgerItems.filter(l=>l.chk);
   if(!sb.length&&!sl.length){
     ['bv-bank','bv-ledger','bv-diff'].forEach(id=>document.getElementById(id).textContent='—');
-    const s=document.getElementById('bal-status');
-    s.textContent='Select rows to validate balance'; s.className='bal-status idle';
-    return;
+    const s=document.getElementById('bal-status');s.textContent='Select rows to validate';s.className='bal-status idle';return;
   }
-  const sumB=sb.reduce((a,b)=>a+b.amount,0), sumL=sl.reduce((a,l)=>a+l.amount,0);
-  const diff=Math.abs(sumB-sumL);
-  document.getElementById('bv-bank').textContent  =sb.length?fmt(sumB):'—';
+  const sumB=sb.reduce((a,b)=>a+b.amount,0),sumL=sl.reduce((a,l)=>a+l.amount,0),diff=Math.abs(sumB-sumL);
+  document.getElementById('bv-bank').textContent=sb.length?fmt(sumB):'—';
   document.getElementById('bv-ledger').textContent=sl.length?fmt(sumL):'—';
-  document.getElementById('bv-diff').textContent  =(sb.length&&sl.length)?(diff===0?'₪ 0':fmt(diff)):'—';
+  document.getElementById('bv-diff').textContent=(sb.length&&sl.length)?(diff===0?'₪ 0':fmt(diff)):'—';
   const s=document.getElementById('bal-status');
   if(diff<0.01&&sb.length&&sl.length){s.textContent='✓ Balanced';s.className='bal-status ok';}
-  else{s.textContent=diff>0?`⚠ Diff: ${fmt(diff)}`:'Select both sides';s.className='bal-status bad';}
+  else if(diff/Math.max(sumB,1)<0.05&&sb.length&&sl.length){s.textContent='≈ '+fmt(diff)+' diff';s.className='bal-status warn';}
+  else{s.textContent=diff>0?'⚠ '+fmt(diff)+' diff':'Select both sides';s.className='bal-status bad';}
 }
-
-// ── Auto-suggest ──────────────────────────────────────────────────────────────
-function runSuggest() {
-  document.getElementById('loading-ov').classList.add('on');
-  document.getElementById('btn-suggest').disabled=true;
-  const steps=['Scanning 1:1 full parity…','Checking fuzzy text matches…','Checking fuzzy amounts…','Detecting 1:Many splits…','Detecting Many:1 merges…','Applying rule engine…'];
-  let si=0;
-  const iv=setInterval(()=>{ if(si<steps.length) document.getElementById('loading-step').textContent=steps[si++]; },300);
-  setTimeout(()=>{
-    clearInterval(iv);
-    suggestionGroups=[];
-    const usedB=new Set(), usedL=new Set();
-
-    // 1:1 Full parity — exact amount + ≤1 day
-    bankLines.forEach(b=>{
-      if(usedB.has(b.id)) return;
-      ledgerItems.forEach(l=>{
-        if(usedL.has(l.id)||usedB.has(b.id)) return;
-        if(b.amount===l.amount&&b.cur===l.cur&&dayDiff(b.date,l.date)<=1){
-          suggestionGroups.push({type:'full',bankIds:[b.id],ledgerIds:[l.id]});
-          usedB.add(b.id); usedL.add(l.id);
-        }
-      });
-    });
-
-    // 1:1 Fuzzy text — description keyword overlap + amount within 5%
-    bankLines.forEach(b=>{
-      if(usedB.has(b.id)) return;
-      const bWords=b.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
-      ledgerItems.forEach(l=>{
-        if(usedL.has(l.id)||usedB.has(b.id)) return;
-        const lWords=l.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
-        const overlap=bWords.some(w=>lWords.some(lw=>lw.includes(w)||w.includes(lw)));
-        const amtClose=Math.abs(b.amount-l.amount)/b.amount<0.05;
-        if(overlap&&amtClose&&dayDiff(b.date,l.date)<=3){
-          suggestionGroups.push({type:'ftxt',bankIds:[b.id],ledgerIds:[l.id]});
-          usedB.add(b.id); usedL.add(l.id);
-        }
-      });
-    });
-
-    // 1:1 Fuzzy amount — within 3%, same category prefix, ≤4 days
-    bankLines.forEach(b=>{
-      if(usedB.has(b.id)) return;
-      ledgerItems.forEach(l=>{
-        if(usedL.has(l.id)||usedB.has(b.id)) return;
-        const amtClose=Math.abs(b.amount-l.amount)/b.amount<0.03;
-        const catClose=b.cat.split(' ')[0].toLowerCase()===l.cat.split(' ')[0].toLowerCase();
-        if(amtClose&&catClose&&dayDiff(b.date,l.date)<=4){
-          suggestionGroups.push({type:'famt',bankIds:[b.id],ledgerIds:[l.id]});
-          usedB.add(b.id); usedL.add(l.id);
-        }
-      });
-    });
-
-    // 1:Many — single bank line, sum of multiple ledger items matches
-    bankLines.forEach(b=>{
-      if(usedB.has(b.id)) return;
-      const candidates=ledgerItems.filter(l=>!usedL.has(l.id)&&l.cur===b.cur&&dayDiff(b.date,l.date)<=5);
-      // try all pairs
-      for(let i=0;i<candidates.length;i++) for(let j=i+1;j<candidates.length;j++){
-        if(Math.abs(candidates[i].amount+candidates[j].amount-b.amount)<0.01){
-          suggestionGroups.push({type:'1many',bankIds:[b.id],ledgerIds:[candidates[i].id,candidates[j].id]});
-          usedB.add(b.id); usedL.add(candidates[i].id); usedL.add(candidates[j].id); return;
-        }
-      }
-    });
-
-    // Many:1 — multiple bank lines sum to single ledger item
-    ledgerItems.forEach(l=>{
-      if(usedL.has(l.id)) return;
-      const candidates=bankLines.filter(b=>!usedB.has(b.id)&&b.cur===l.cur&&dayDiff(b.date,l.date)<=5);
-      for(let i=0;i<candidates.length;i++) for(let j=i+1;j<candidates.length;j++){
-        if(Math.abs(candidates[i].amount+candidates[j].amount-l.amount)<0.01){
-          suggestionGroups.push({type:'many1',bankIds:[candidates[i].id,candidates[j].id],ledgerIds:[l.id]});
-          usedB.add(candidates[i].id); usedB.add(candidates[j].id); usedL.add(l.id); return;
-        }
-      }
-    });
-
-    // Rule-based
-    bankLines.forEach(b=>{
-      if(usedB.has(b.id)) return;
-      rules.forEach(r=>{
-        if(usedB.has(b.id)) return;
-        const descMatch=!r.bdesc||b.desc.toUpperCase().includes(r.bdesc.toUpperCase());
-        const catMatch=!r.bcat||b.cat===r.bcat;
-        const accMatch=!r.bacc||b.acc===r.bacc;
-        const aminOk=!r.amin||b.amount>=parseFloat(r.amin);
-        const amaxOk=!r.amax||b.amount<=parseFloat(r.amax);
-        if(descMatch&&catMatch&&accMatch&&aminOk&&amaxOk){
-          const nid='l_rule_'+b.id;
-          if(!ledgerItems.find(x=>x.id===nid))
-            ledgerItems.push({id:nid,date:b.date,amount:b.amount,cur:b.cur,cat:r.lcat||r.bcat,desc:r.ldesc+' (auto)',acc:'AUTO',chk:false});
-          suggestionGroups.push({type:'rule',bankIds:[b.id],ledgerIds:[nid],ruleCat:r.lcat||r.bcat});
-          usedB.add(b.id); usedL.add(nid);
-        }
-      });
-    });
-
-    // Auto-select all suggestion group items
-    suggestionGroups.forEach(g=>{
-      g.bankIds.forEach(id=>{const b=bankLines.find(x=>x.id===id);if(b)b.chk=true;});
-      g.ledgerIds.forEach(id=>{const l=ledgerItems.find(x=>x.id===id);if(l)l.chk=true;});
-    });
-
-    suggestDone=true;
-    document.getElementById('loading-ov').classList.remove('on');
-    render();
-    const counts=Object.fromEntries(['full','ftxt','famt','1many','many1','rule'].map(t=>[t,suggestionGroups.filter(g=>g.type===t).length]));
-    toast(`Auto-suggest: ${suggestionGroups.length} groups — ${counts.full} full · ${counts.ftxt} fuzzy-text · ${counts.famt} fuzzy-amt · ${counts.many1||counts['1many']?counts['1many']+'↑ '+counts.many1+'↓ ':''} · ${counts.rule} rule`);
-  },2100);
-}
-
-// ── Match group ───────────────────────────────────────────────────────────────
-function matchGroup(gi) {
-  const g = suggestionGroups[gi]; if(!g) return;
-  const bItems=g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
-  const lItems=g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
-  matchCounter++;
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:bItems,ledgers:lItems,type:'suggestion',kind:GROUP_META[g.type]?.label||g.type});
-  const bIds=g.bankIds, lIds=g.ledgerIds;
-  bankLines=bankLines.filter(b=>!bIds.includes(b.id));
-  ledgerItems=ledgerItems.filter(l=>!lIds.includes(l.id));
-  suggestionGroups.splice(gi,1);
-  if(!suggestionGroups.length) suggestDone=false;
-  render(); renderMatched(); updateBadges();
-  toast(`Group matched ✓`);
-}
-
-function matchAll() {
-  const count=suggestionGroups.length;
-  [...suggestionGroups].forEach((_,i)=>matchGroup(0));
-  toast(`${count} groups matched ✓`);
-}
-
-// ── Manual match (selected rows, no group) ────────────────────────────────────
-function doManualMatch() {
-  const sb=bankLines.filter(b=>b.chk), sl=ledgerItems.filter(l=>l.chk);
-  if(!sb.length||!sl.length){toast('Select items on both sides','blue');return;}
-  const sumB=sb.reduce((a,b)=>a+b.amount,0), sumL=sl.reduce((a,l)=>a+l.amount,0);
-  if(Math.abs(sumB-sumL)>0.01){toast('Balance mismatch — cannot match','blue');return;}
-  matchCounter++;
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:sb,ledgers:sl,type:'manual',kind:'Manual'});
-  const bIds=sb.map(b=>b.id), lIds=sl.map(l=>l.id);
-  bankLines=bankLines.filter(b=>!bIds.includes(b.id));
-  ledgerItems=ledgerItems.filter(l=>!lIds.includes(l.id));
-  suggestionGroups=suggestionGroups.filter(g=>!g.bankIds.some(id=>bIds.includes(id)));
-  render(); renderMatched(); updateBadges();
-  toast(`Manual match confirmed ✓`);
-}
-
-// ── Matched view ──────────────────────────────────────────────────────────────
-function renderMatched() {
-  const body=document.getElementById('matched-body');
-  if(!matched.length){
-    body.innerHTML=`<tr><td colspan="8"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;
-    return;
-  }
-  body.innerHTML=matched.map(m=>`
-    <tr>
-      <td style="color:var(--subtle)">#${m.id}</td>
-      <td style="color:var(--muted)">${m.on}</td>
-      <td><div class="pl">${m.banks.map(b=>`<strong>${b.desc}</strong>`).join('<br>')}
-        <span>${m.banks.map(b=>b.date+' · '+b.cat).join(' / ')}</span></div></td>
-      <td><div class="pl">${m.ledgers.map(l=>`<strong>${l.desc}</strong>`).join('<br>')}
-        <span>${m.ledgers.map(l=>l.date+' · '+l.cat).join(' / ')}</span></div></td>
-      <td style="font-weight:700;color:var(--black)">${fmt(m.banks.reduce((a,b)=>a+b.amount,0))}</td>
-      <td><span class="tag ${m.type==='suggestion'?'tag-sug':'tag-manual'}">${m.type}</span></td>
-      <td><span class="tag tag-info">${m.kind}</span></td>
-      <td><button class="btn-danger-sm" onclick="cancelMatch(${m.id})">Cancel</button></td>
-    </tr>`).join('');
-}
-
-function cancelMatch(id) {
-  const m=matched.find(p=>p.id===id); if(!m) return;
-  m.banks.forEach(b=>bankLines.push({...b,chk:false}));
-  m.ledgers.forEach(l=>ledgerItems.push({...l,chk:false}));
-  matched=matched.filter(p=>p.id!==id);
-  renderMatched(); render(); updateBadges();
-  toast('Match cancelled — items restored','blue');
-}
-
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-function switchTab(t) {
-  document.getElementById('tab-recon').classList.toggle('active',t==='recon');
-  document.getElementById('tab-matched').classList.toggle('active',t==='matched');
-  document.getElementById('view-recon').classList.toggle('hidden',t!=='recon');
-  document.getElementById('view-matched').classList.toggle('hidden',t!=='matched');
-  if(t==='matched') renderMatched();
-}
-function updateBadges() {
+function updateBadges(){
   document.getElementById('bdg-recon').textContent=bankLines.length+ledgerItems.length;
   document.getElementById('bdg-matched').textContent=matched.length;
 }
 
-// ── Rules ─────────────────────────────────────────────────────────────────────
-function openRules(){renderRules();document.getElementById('rules-modal').classList.add('on')}
-function closeRules(){document.getElementById('rules-modal').classList.remove('on');document.getElementById('rule-form').classList.remove('on')}
+function runSuggest(){
+  document.getElementById('loading-ov').classList.add('on');
+  document.getElementById('btn-suggest').disabled=true;
+  const steps=['Scanning full parity…','Checking fuzzy text…','Checking fuzzy amount…','Detecting 1:Many splits…','Detecting Many:1 merges…','Applying rule engine…'];
+  let si=0;
+  const iv=setInterval(()=>{if(si<steps.length)document.getElementById('l-step').textContent=steps[si++];},310);
+  setTimeout(()=>{
+    clearInterval(iv);suggGroups=[];
+    const usedB=new Set(),usedL=new Set();
+    // 1 full parity
+    bankLines.forEach(b=>{
+      if(usedB.has(b.id))return;
+      ledgerItems.forEach(l=>{
+        if(usedL.has(l.id)||usedB.has(b.id))return;
+        if(b.amount===l.amount&&b.cur===l.cur&&dayDiff(b.date,l.date)<=1){
+          suggGroups.push({type:'full',bankIds:[b.id],ledgerIds:[l.id]});
+          usedB.add(b.id);usedL.add(l.id);
+        }
+      });
+    });
+    // 2 fuzzy text
+    bankLines.forEach(b=>{
+      if(usedB.has(b.id))return;
+      const bw=b.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
+      ledgerItems.forEach(l=>{
+        if(usedL.has(l.id)||usedB.has(b.id))return;
+        const lw=l.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
+        const ov=bw.some(w=>lw.some(x=>x.includes(w)||w.includes(x)));
+        if(ov&&Math.abs(b.amount-l.amount)/b.amount<0.05&&dayDiff(b.date,l.date)<=3){
+          suggGroups.push({type:'ftxt',bankIds:[b.id],ledgerIds:[l.id]});
+          usedB.add(b.id);usedL.add(l.id);
+        }
+      });
+    });
+    // 3 fuzzy amount
+    bankLines.forEach(b=>{
+      if(usedB.has(b.id))return;
+      ledgerItems.forEach(l=>{
+        if(usedL.has(l.id)||usedB.has(b.id))return;
+        const co=b.cat.split(' ')[0].toLowerCase()===l.cat.split(' ')[0].toLowerCase();
+        if(co&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
+          suggGroups.push({type:'famt',bankIds:[b.id],ledgerIds:[l.id]});
+          usedB.add(b.id);usedL.add(l.id);
+        }
+      });
+    });
+    // 4 1:many
+    bankLines.forEach(b=>{
+      if(usedB.has(b.id))return;
+      const ca=ledgerItems.filter(l=>!usedL.has(l.id)&&l.cur===b.cur&&dayDiff(b.date,l.date)<=5);
+      for(let i=0;i<ca.length;i++)for(let j=i+1;j<ca.length;j++){
+        if(Math.abs(ca[i].amount+ca[j].amount-b.amount)<0.01){
+          suggGroups.push({type:'1many',bankIds:[b.id],ledgerIds:[ca[i].id,ca[j].id]});
+          usedB.add(b.id);usedL.add(ca[i].id);usedL.add(ca[j].id);return;
+        }
+      }
+    });
+    // 5 many:1
+    ledgerItems.forEach(l=>{
+      if(usedL.has(l.id))return;
+      const ca=bankLines.filter(b=>!usedB.has(b.id)&&b.cur===l.cur&&dayDiff(b.date,l.date)<=5);
+      for(let i=0;i<ca.length;i++)for(let j=i+1;j<ca.length;j++){
+        if(Math.abs(ca[i].amount+ca[j].amount-l.amount)<0.01){
+          suggGroups.push({type:'many1',bankIds:[ca[i].id,ca[j].id],ledgerIds:[l.id]});
+          usedB.add(ca[i].id);usedB.add(ca[j].id);usedL.add(l.id);return;
+        }
+      }
+    });
+    // 6 rule-based — ALL into ONE group
+    const rrows=[];
+    bankLines.forEach(b=>{
+      if(usedB.has(b.id))return;
+      for(const r of rules){
+        const dm=!r.bdesc||b.desc.toUpperCase().includes(r.bdesc.toUpperCase());
+        const cm=!r.bcat||b.cat===r.bcat;
+        const am=!r.bacc||b.acc===r.bacc;
+        const lo=!r.amin||b.amount>=parseFloat(r.amin);
+        const hi=!r.amax||b.amount<=parseFloat(r.amax);
+        if(dm&&cm&&am&&lo&&hi){
+          rrows.push({bankId:b.id,proposed:{id:'pl_'+b.id,date:b.date,amount:b.amount,cur:b.cur,cat:r.lcat||r.bcat,desc:(r.ldesc||r.bdesc)+' (proposed)',acc:'AUTO'},ruleCat:r.lcat||r.bcat});
+          usedB.add(b.id);break;
+        }
+      }
+    });
+    if(rrows.length){
+      suggGroups.push({type:'rule',bankIds:rrows.map(r=>r.bankId),proposedLedgers:rrows.map(r=>r.proposed),ledgerIds:[],ruleCats:rrows.map(r=>r.ruleCat)});
+    }
+    // auto-select
+    suggGroups.forEach(g=>{
+      g.bankIds.forEach(id=>{const b=bankLines.find(x=>x.id===id);if(b)b.chk=true;});
+      if(g.type!=='rule') g.ledgerIds.forEach(id=>{const l=ledgerItems.find(x=>x.id===id);if(l)l.chk=true;});
+    });
+    sugDone=true;
+    document.getElementById('loading-ov').classList.remove('on');
+    render();
+    const cnt={};suggGroups.forEach(g=>{cnt[g.type]=(cnt[g.type]||0)+(g.type==='rule'?g.bankIds.length:1);});
+    toast(`Auto-suggest: ${suggGroups.length} groups · ${cnt.full||0} full · ${cnt.ftxt||0} fuzzy-txt · ${cnt.famt||0} fuzzy-amt · ${cnt['1many']||0} 1:M · ${cnt.many1||0} M:1 · ${cnt.rule||0} rule`);
+  },2000);
+}
+
+function matchGroup(gi){
+  const g=suggGroups[gi];if(!g)return;
+  const bItems=g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
+  let lItems;
+  if(g.type==='rule'){
+    g.proposedLedgers.forEach(pl=>{if(!ledgerItems.find(x=>x.id===pl.id))ledgerItems.push({...pl,chk:false});});
+    g.ledgerIds=g.proposedLedgers.map(p=>p.id);
+    lItems=g.proposedLedgers.map(pl=>ledgerItems.find(x=>x.id===pl.id)).filter(Boolean);
+  } else {
+    lItems=g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
+  }
+  matchCounter++;
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:bItems,ledgers:lItems,type:'suggestion',kind:GM[g.type]?.label||g.type});
+  bankLines=bankLines.filter(b=>!g.bankIds.includes(b.id));
+  ledgerItems=ledgerItems.filter(l=>!g.ledgerIds.includes(l.id));
+  suggGroups.splice(gi,1);
+  if(!suggGroups.length)sugDone=false;
+  render();renderMatched();updateBadges();
+  toast('Group confirmed ✓');
+}
+
+function renderMatched(){
+  const body=document.getElementById('matched-body');
+  if(!matched.length){body.innerHTML=`<tr><td colspan="8"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;return;}
+  body.innerHTML=matched.map(m=>`<tr>
+    <td style="color:var(--subtle);font-weight:600">#${m.id}</td>
+    <td style="color:var(--muted)">${m.on}</td>
+    <td><div class="pl">${m.banks.map(b=>`<strong>${b.desc}</strong>`).join('<br>')}<span>${m.banks.map(b=>b.date+' · '+b.cat).join(' / ')}</span></div></td>
+    <td><div class="pl">${m.ledgers.map(l=>`<strong>${l.desc}</strong>`).join('<br>')}<span>${m.ledgers.map(l=>l.date+' · '+l.cat).join(' / ')}</span></div></td>
+    <td style="font-weight:700;color:var(--black)">${fmt(m.banks.reduce((a,b)=>a+b.amount,0))}</td>
+    <td><span class="tag ${m.type==='suggestion'?'tg-sug':'tg-manual'}">${m.type}</span></td>
+    <td><span class="tag tg-info">${m.kind}</span></td>
+    <td><button class="btn-danger-sm" onclick="cancelMatch(${m.id})">Cancel</button></td>
+  </tr>`).join('');
+}
+function cancelMatch(id){
+  const m=matched.find(p=>p.id===id);if(!m)return;
+  m.banks.forEach(b=>bankLines.push({...b,chk:false}));
+  m.ledgers.forEach(l=>ledgerItems.push({...l,chk:false}));
+  matched=matched.filter(p=>p.id!==id);
+  renderMatched();render();updateBadges();
+  toast('Match cancelled','blue');
+}
+
+function sw(t){
+  ['recon','matched'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('on',x===t);document.getElementById('view-'+x).classList.toggle('hidden',x!==t);});
+  if(t==='matched')renderMatched();
+}
+function openRules(){renderRules();document.getElementById('rules-modal').classList.add('on');}
+function closeRules(){document.getElementById('rules-modal').classList.remove('on');document.getElementById('rule-form').classList.remove('on');}
 function renderRules(){
   document.getElementById('rules-body').innerHTML=rules.length
     ?rules.map(r=>`<tr>
-      <td><strong>${r.bdesc||'—'}</strong></td>
-      <td>${r.bcat?`<span class="tag tag-famt">${r.bcat}</span>`:'Any'}</td>
-      <td>${r.txtype||'Any'}</td>
-      <td>${r.amin||r.amax?`${r.amin||'0'} – ${r.amax||'∞'}`:'Any'}</td>
-      <td class="muted">${r.bacc||'Any'}</td>
-      <td class="arrow">→</td>
-      <td>${r.ldesc}</td>
-      <td><span class="tag tag-rule">${r.lcat||'—'}</span></td>
-      <td><button class="btn-danger-sm" onclick="delRule('${r.id}')">Delete</button></td>
-    </tr>`).join('')
-    :`<tr><td colspan="9" style="text-align:center;color:var(--subtle);padding:24px;font-weight:500">No rules defined.</td></tr>`;
+        <td><strong>${r.bdesc||'—'}</strong></td>
+        <td>${r.bcat?`<span class="tag tg-famt">${r.bcat}</span>`:'Any'}</td>
+        <td style="color:var(--muted)">${r.tx||'Any'}</td>
+        <td style="color:var(--muted);font-size:11px">${r.amin||r.amax?r.amin+'–'+(r.amax||'∞'):'Any'}</td>
+        <td style="color:var(--subtle);font-size:11px">${r.bacc||'Any'}</td>
+        <td class="r-arrow">→</td>
+        <td>${r.ldesc}</td>
+        <td><span class="tag tg-rule">${r.lcat||'—'}</span></td>
+        <td><button class="btn-danger-sm" onclick="delRule('${r.id}')">Delete</button></td>
+      </tr>`).join('')
+    :`<tr><td colspan="9" style="text-align:center;color:var(--subtle);padding:24px">No rules defined.</td></tr>`;
 }
-function toggleRuleForm(){document.getElementById('rule-form').classList.toggle('on')}
+function toggleRF(){document.getElementById('rule-form').classList.toggle('on');}
 function saveRule(){
   const bd=document.getElementById('rf-bdesc').value.trim(),ld=document.getElementById('rf-ldesc').value.trim();
-  if(!bd&&!ld){alert('Fill at least a bank description or ledger description.');return;}
-  rules.push({id:'r'+Date.now(),bdesc:bd,bcat:document.getElementById('rf-bcat').value,
-    txtype:document.getElementById('rf-txtype').value,rail:document.getElementById('rf-rail').value,
-    amin:document.getElementById('rf-amin').value,amax:document.getElementById('rf-amax').value,
-    bacc:document.getElementById('rf-bacc').value,mcc:document.getElementById('rf-mcc').value,
-    ldesc:ld||bd,lcat:document.getElementById('rf-lcat').value||'Operating Expenses'});
-  renderRules();toggleRuleForm();
+  if(!bd&&!ld){alert('Fill at least one description field.');return;}
+  rules.push({id:'r'+Date.now(),bdesc:bd,bcat:document.getElementById('rf-bcat').value,tx:document.getElementById('rf-tx').value,
+    rail:document.getElementById('rf-rail').value,amin:document.getElementById('rf-amin').value,
+    amax:document.getElementById('rf-amax').value,bacc:document.getElementById('rf-bacc').value,
+    mcc:document.getElementById('rf-mcc').value,ldesc:ld||bd,lcat:document.getElementById('rf-lcat').value||'Operating Expenses'});
+  renderRules();toggleRF();
   ['rf-bdesc','rf-ldesc','rf-amin','rf-amax','rf-bacc','rf-mcc'].forEach(id=>document.getElementById(id).value='');
   toast('Rule saved');
 }
 function delRule(id){rules=rules.filter(r=>r.id!==id);renderRules();}
-
-// ── Flying window ─────────────────────────────────────────────────────────────
 function openFly(){
   const sel=bankLines.filter(b=>b.chk);
   if(!sel.length){toast('Select at least one bank line first','blue');return;}
   document.getElementById('fly-amt').value=sel.reduce((a,b)=>a+b.amount,0);
   document.getElementById('fly-date').value=sel[0].date;
-  document.getElementById('fly-sub').textContent=sel.length===1?`For: ${sel[0].desc}`:`For ${sel.length} bank lines`;
+  document.getElementById('fly-sub').textContent=sel.length===1?'For: '+sel[0].desc:'For '+sel.length+' bank lines';
   document.getElementById('fly-win').classList.add('on');
 }
-function closeFly(){document.getElementById('fly-win').classList.remove('on')}
+function closeFly(){document.getElementById('fly-win').classList.remove('on');}
 function createLedger(){
   const amt=parseFloat(document.getElementById('fly-amt').value),date=document.getElementById('fly-date').value;
   if(!amt||!date){toast('Fill amount and date','blue');return;}
   const cat=document.getElementById('fly-cat').value;
-  ledgerItems.push({id:'l_m_'+Date.now(),date,amount:amt,cur:'ILS',cat,desc:document.getElementById('fly-notes').value||cat,acc:'MANUAL',chk:true});
+  ledgerItems.push({id:'lm_'+Date.now(),date,amount:amt,cur:'ILS',cat,desc:document.getElementById('fly-notes').value||cat,acc:'MANUAL',chk:true});
   closeFly();render();
-  toast('Ledger item created and auto-selected ✓');
+  toast('Ledger item created and selected ✓');
 }
-
-// ── Business change ───────────────────────────────────────────────────────────
 function onBizChange(v){
-  if(!v) return;
-  suggestDone=false;suggestionGroups=[];
+  if(!v)return;
+  sugDone=false;suggGroups=[];
   bankLines.forEach(b=>b.chk=false);ledgerItems.forEach(l=>l.chk=false);
-  render();toast(`Loaded: ${document.querySelector('.biz').selectedOptions[0].text}`,'blue');
+  render();toast('Loaded: '+document.querySelector('.biz').selectedOptions[0].text,'blue');
 }
-
-// ── Init ──────────────────────────────────────────────────────────────────────
 render();updateBadges();renderMatched();
 </script>
 </body>
