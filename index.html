@@ -370,7 +370,7 @@ let bankLines=[
   {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:10,   chk:false},
   {id:'b21',date:'2024-05-12',amount:2978, cur:'ILS',cat:'Revenue',        desc:'STRIPE PAYOUT',     bank:'Bank Leumi',   acc:'IL-123-4567',type:'credit',fee:12,   fxAmt:1000,fxCur:'USD',fxRate:2.99,chk:false},
   // Cross-currency wire: USD account (full parity) + ILS account (fuzzy amount)
-  {id:'b23',date:'2024-05-15',amount:10000,   cur:'USD',cat:'Transfer',        desc:'BANK-TX-991 WIRE OUT',  bank:'USD Account',  acc:'USD-001',      type:'debit', isInternal:true,chk:false},
+  {id:'b23',date:'2024-05-15',amount:10000,   cur:'USD',cat:'Transfer',        desc:'BANK-TX-991 WIRE OUT',  bank:'USD Account',  acc:'USD-001',      type:'debit', isInternal:true,noFx:true,chk:false},
   {id:'b24',date:'2024-05-16',amount:35919.5, cur:'ILS',cat:'Cash-in-Transit', desc:'BANK-TX-995 WIRE IN',   bank:'Bank Hapoalim',acc:'IL-456-7890',  type:'credit',isInternal:true,fee:80.5,fxAmt:10000,fxCur:'USD',fxRate:3.6,chk:false},
   // 1:Many ×2
   {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
@@ -588,7 +588,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxM
   const dc=b=>(b.type==='credit'?'var(--green)':'var(--red)');
   const bH=b
     ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
-      <td>${b.date}</td><td class="amt" style="color:${dc(b)};line-height:1.6">${fmtC(b.amount,b.cur)}${b.fxAmt?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">${b.fxAmt.toLocaleString()} ${b.fxCur} · 1=${b.fxRate}</span>`:(b.cur!=='ILS'&&FX_RATES[b.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(b.amount*FX_RATES[b.cur]))}</span>`:'')}${bankAmtNote?`<br>${bankAmtNote}`:''}</td><td>${b.cur}</td>
+      <td>${b.date}</td><td class="amt" style="color:${dc(b)};line-height:1.6">${fmtC(b.amount,b.cur)}${b.fxAmt?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">${b.fxAmt.toLocaleString()} ${b.fxCur} · 1=${b.fxRate}</span>`:(b.cur!=='ILS'&&FX_RATES[b.cur]&&!b.noFx?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(b.amount*FX_RATES[b.cur]))}</span>`:'')}${bankAmtNote?`<br>${bankAmtNote}`:''}</td><td>${b.cur}</td>
       <td title="${b.cat}">${b.cat}</td>
       <td title="${b.desc}">${b.desc}</td>
       <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
