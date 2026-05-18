@@ -360,6 +360,7 @@ let bankLines=[
   // 1:1 Fuzzy Amount ×2  (bank < ledger)
   {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b21',date:'2024-05-12',amount:1850, cur:'USD',cat:'SaaS',           desc:'STRIPE INC',         bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   // 1:Many ×2
   {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   {id:'b14',date:'2024-05-18',amount:9000, cur:'ILS',cat:'Services',       desc:'PROJECT INVOICE',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
@@ -389,6 +390,7 @@ let ledgerItems=[
   // 1:1 Fuzzy Amount ×2  (ledger > bank)
   {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
   {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
+  {id:'l21',date:'2024-05-14',amount:1900, cur:'USD',cat:'SaaS',           desc:'Stripe platform fee',       acc:'SVC-002',type:'debit', chk:false},
   // 1:Many ×2
   {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
   {id:'l5', date:'2024-05-05',amount:2000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 2',   acc:'CST-001',type:'debit', chk:false},
@@ -410,6 +412,7 @@ let rules=[
 let matched=[],suggGroups=[],matchCounter=0,sugDone=false;
 
 const fmt=n=>'₪ '+new Intl.NumberFormat('en-IL').format(n);
+const fmtC=(n,cur)=>(cur==='USD'?'$ ':cur==='EUR'?'€ ':'₪ ')+new Intl.NumberFormat('en-IL').format(n);
 const dayDiff=(a,b)=>Math.abs(new Date(a)-new Date(b))/864e5;
 function toast(msg,type='green'){const w=document.getElementById('toasts'),t=document.createElement('div');t.className='toast '+type;t.textContent=msg;w.appendChild(t);setTimeout(()=>t.remove(),3200);}
 
@@ -471,9 +474,10 @@ function render(){
         const rc=Math.max(bItems.length,lItems.length);
         for(let i=0;i<rc;i++){
           const b=bItems[i],l=lItems[i];
-          const ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+          const isFX=b&&b.cur!=='ILS';
+          const ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
             <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:76px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
-            <button class="btn-danger-sm" style="width:76px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Keep Open</button>
+            <span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isFX?'FX':'Bank Fee'}</span>
           </div>`:'';
           body.appendChild(mkRow(b||null,l||null,null,null,false,1,false,ctr));
         }
@@ -542,7 +546,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null){
   const dc=b=>(b.type==='credit'?'var(--green)':'var(--red)');
   const bH=b
     ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
-      <td>${b.date}</td><td class="amt" style="color:${dc(b)}">${fmt(b.amount)}</td><td>${b.cur}</td>
+      <td>${b.date}</td><td class="amt" style="color:${dc(b)}">${fmtC(b.amount,b.cur)}</td><td>${b.cur}</td>
       <td title="${b.cat}">${b.cat}</td>
       <td title="${b.desc}">${b.desc}</td>
       <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
@@ -557,7 +561,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null){
   } else if(l){
     const lc=l.type==='credit'?'var(--green)':'var(--red)';
     lH=`<td class="ed" contenteditable="true" onblur="editL('date','${l.id}',this)">${l.date}</td>
-      <td class="amt ed" contenteditable="true" onblur="editL('amount','${l.id}',this)" style="color:${lc}">${fmt(l.amount)}</td>
+      <td class="amt ed" contenteditable="true" onblur="editL('amount','${l.id}',this)" style="color:${lc}">${fmtC(l.amount,l.cur)}</td>
       <td>${l.cur}</td>
       <td class="ed" contenteditable="true" onblur="editL('cat','${l.id}',this)">${l.cat}</td>
       <td class="ed" contenteditable="true" onblur="editL('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
@@ -574,7 +578,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null){
 
 function editL(f,id,el){
   const l=ledgerItems.find(x=>x.id===id);if(!l)return;
-  if(f==='amount'){const n=parseFloat(el.textContent.replace(/[₪,\s]/g,''));if(!isNaN(n)){l.amount=n;el.textContent=fmt(n);}}
+  if(f==='amount'){const n=parseFloat(el.textContent.replace(/[₪$€,\s]/g,''));if(!isNaN(n)){l.amount=n;el.textContent=fmtC(n,l.cur);}}
   else l[f]=el.textContent.trim();
   updateBal();
 }
@@ -582,13 +586,13 @@ function toggle(side,id,chk){
   if(side==='bank'){
     const b=bankLines.find(x=>x.id===id);if(b)b.chk=chk;
     if(sugDone){
-      const g=suggGroups.find(g=>['full','ftxt'].includes(g.type)&&g.bankIds.includes(id));
+      const g=suggGroups.find(g=>['full','ftxt','famt'].includes(g.type)&&g.bankIds.includes(id));
       if(g){const l=ledgerItems.find(x=>x.id===g.ledgerIds[g.bankIds.indexOf(id)]);if(l)l.chk=chk;}
     }
   } else {
     const l=ledgerItems.find(x=>x.id===id);if(l)l.chk=chk;
     if(sugDone){
-      const g=suggGroups.find(g=>['full','ftxt'].includes(g.type)&&g.ledgerIds.includes(id));
+      const g=suggGroups.find(g=>['full','ftxt','famt'].includes(g.type)&&g.ledgerIds.includes(id));
       if(g){const b=bankLines.find(x=>x.id===g.bankIds[g.ledgerIds.indexOf(id)]);if(b)b.chk=chk;}
     }
   }
@@ -664,7 +668,7 @@ function runSuggest(){
       ledgerItems.forEach(l=>{
         if(usedL.has(l.id)||usedB.has(b.id))return;
         const co=b.cat.split(' ')[0].toLowerCase()===l.cat.split(' ')[0].toLowerCase();
-        if(co&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
+        if(co&&b.cur===l.cur&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
           famtG.bankIds.push(b.id);famtG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
