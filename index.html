@@ -804,27 +804,34 @@ function matchGroup(gi){
   const g=suggGroups[gi];if(!g)return;
   const now=new Date().toLocaleDateString('en-GB');
   const kind=GM[g.type]?.label||g.type;
+  const confirmedB=new Set(),confirmedL=new Set();
   if(g.type==='rule'){
     g.proposedLedgers.forEach(pl=>{if(!ledgerItems.find(x=>x.id===pl.id))ledgerItems.push({...pl,chk:false});});
     g.ledgerIds=g.proposedLedgers.map(p=>p.id);
     g.bankIds.forEach((bid,i)=>{
       const b=bankLines.find(x=>x.id===bid),l=ledgerItems.find(x=>x.id===g.ledgerIds[i]);
-      if(b&&l){matchCounter++;matched.push({id:matchCounter,on:now,banks:[b],ledgers:[l],type:'suggestion',source:'suggestion',kind});}
+      if(b&&l&&b.chk){matchCounter++;matched.push({id:matchCounter,on:now,banks:[b],ledgers:[l],type:'suggestion',source:'suggestion',kind});confirmedB.add(bid);confirmedL.add(g.ledgerIds[i]);}
     });
   } else if(g.subMatches){
     g.subMatches.forEach(sm=>{
       const bs=sm.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
       const ls=sm.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
-      if(bs.length&&ls.length){matchCounter++;matched.push({id:matchCounter,on:now,banks:bs,ledgers:ls,type:'suggestion',source:'suggestion',kind});}
+      if(bs.length&&ls.length&&bs.every(b=>b.chk)&&ls.every(l=>l.chk)){
+        matchCounter++;matched.push({id:matchCounter,on:now,banks:bs,ledgers:ls,type:'suggestion',source:'suggestion',kind});
+        bs.forEach(b=>confirmedB.add(b.id));ls.forEach(l=>confirmedL.add(l.id));
+      }
     });
   } else {
     g.bankIds.forEach((bid,i)=>{
       const b=bankLines.find(x=>x.id===bid),l=ledgerItems.find(x=>x.id===g.ledgerIds[i]);
-      if(b&&l){matchCounter++;matched.push({id:matchCounter,on:now,banks:[b],ledgers:[l],type:'suggestion',source:'suggestion',kind});}
+      if(b&&l&&b.chk&&l.chk){matchCounter++;matched.push({id:matchCounter,on:now,banks:[b],ledgers:[l],type:'suggestion',source:'suggestion',kind});confirmedB.add(bid);confirmedL.add(g.ledgerIds[i]);}
     });
   }
-  bankLines=bankLines.filter(b=>!g.bankIds.includes(b.id));
-  ledgerItems=ledgerItems.filter(l=>!g.ledgerIds.includes(l.id));
+  // uncheck items left unconfirmed so they return cleanly to unmatched pool
+  g.bankIds.filter(id=>!confirmedB.has(id)).forEach(id=>{const b=bankLines.find(x=>x.id===id);if(b)b.chk=false;});
+  g.ledgerIds.filter(id=>!confirmedL.has(id)).forEach(id=>{const l=ledgerItems.find(x=>x.id===id);if(l)l.chk=false;});
+  bankLines=bankLines.filter(b=>!confirmedB.has(b.id));
+  ledgerItems=ledgerItems.filter(l=>!confirmedL.has(l.id));
   suggGroups.splice(gi,1);
   if(!suggGroups.length)sugDone=false;
   render();renderMatched();renderPartialView();updateBadges();
