@@ -423,6 +423,7 @@ let matched=[],suggGroups=[],matchCounter=0,sugDone=false;
 
 const fmt=n=>'₪ '+new Intl.NumberFormat('en-IL').format(n);
 const fmtC=(n,cur)=>(cur==='USD'?'$ ':cur==='EUR'?'€ ':'₪ ')+new Intl.NumberFormat('en-IL').format(n);
+const FX_RATES={USD:3.7,EUR:4.0};
 const dayDiff=(a,b)=>Math.abs(new Date(a)-new Date(b))/864e5;
 function toast(msg,type='green'){const w=document.getElementById('toasts'),t=document.createElement('div');t.className='toast '+type;t.textContent=msg;w.appendChild(t);setTimeout(()=>t.remove(),3200);}
 
@@ -485,12 +486,12 @@ function render(){
         for(let i=0;i<rc;i++){
           const b=bItems[i],l=lItems[i];
           const isFX=b&&b.cur!=='ILS';
+          const amtTag=b?`<span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isFX?'FX':'Bank Fee'}</span>`:'';
           const ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
             <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:82px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
             <button class="btn-danger-sm" style="font-size:10px;padding:3px 5px;width:82px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Partial Payment</button>
-            <span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isFX?'FX':'Bank Fee'}</span>
           </div>`:'';
-          body.appendChild(mkRow(b||null,l||null,null,null,false,1,false,ctr));
+          body.appendChild(mkRow(b||null,l||null,null,null,false,1,false,ctr,false,amtTag));
         }
       } else {
         // Default: full/ftxt/rule/many1 (non-subMatches)
@@ -538,7 +539,7 @@ function render(){
   updateBal();updateBadges();
 }
 
-function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxMenu=false){
+function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxMenu=false,bankAmtNote=null){
   const tr=document.createElement('tr');
   if((b&&b.chk)||(l&&l.chk))tr.classList.add('sel');
   if(subStart)tr.classList.add('sm-div');
@@ -558,7 +559,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxM
   const dc=b=>(b.type==='credit'?'var(--green)':'var(--red)');
   const bH=b
     ?`<td class="chk"><input type="checkbox" ${b.chk?'checked':''} onchange="toggle('bank','${b.id}',this.checked)"></td>
-      <td>${b.date}</td><td class="amt" style="color:${dc(b)}">${fmtC(b.amount,b.cur)}</td><td>${b.cur}</td>
+      <td>${b.date}</td><td class="amt" style="color:${dc(b)};line-height:1.6">${fmtC(b.amount,b.cur)}${b.cur!=='ILS'&&FX_RATES[b.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(b.amount*FX_RATES[b.cur]))}</span>`:''}${bankAmtNote?`<br>${bankAmtNote}`:''}</td><td>${b.cur}</td>
       <td title="${b.cat}">${b.cat}</td>
       <td title="${b.desc}">${b.desc}</td>
       <td class="dim">${b.bank}</td><td class="dim">${b.acc}</td>`
