@@ -113,6 +113,7 @@ table.ut tbody td.ed{cursor:text}
 table.ut tbody td.ed:hover{background:rgba(249,115,22,.04)}
 .prop{color:var(--subtle)!important;opacity:.6;font-style:italic;background:#f8fafc}
 tr.sm-div td{border-top:2px solid var(--border)!important}
+tr.grp-gray td{color:var(--subtle)!important;background:#f5f5f7!important;opacity:.7}
 input[type=checkbox]{width:13px;height:13px;cursor:pointer;accent-color:var(--orange)}
 .matched-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
 table.mt{width:100%;border-collapse:collapse;font-size:12px}
@@ -439,6 +440,7 @@ function render(){
       const sumB=(hasChk?chkB:bItems).reduce((a,x)=>a+x.amount,0);
       const sumL=(hasChk?chkL:lItems).reduce((a,x)=>a+x.amount,0);
       const diff=Math.abs(sumB-sumL);
+      const isUnbalanced=hasChk&&(g.type==='1many'||g.type==='many1')&&diff>=0.01;
       // group header — no tag badge, plain text label
       const hr=document.createElement('tr');hr.className='gh';
       let hNote=isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>'
@@ -458,7 +460,9 @@ function render(){
           const smL=sm.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
           const smRc=Math.max(smB.length,smL.length);
           for(let i=0;i<smRc;i++){
-            body.appendChild(mkRow(smB[i]||null,smL[i]||null,rowIdx===0?g.type:'__cont',null,false,rowIdx===0?totalRows:0,smi>0&&i===0));
+            const row=mkRow(smB[i]||null,smL[i]||null,rowIdx===0?g.type:'__cont',null,false,rowIdx===0?totalRows:0,smi>0&&i===0);
+            if(isUnbalanced)row.classList.add('grp-gray');
+            body.appendChild(row);
             rowIdx++;
           }
         });
