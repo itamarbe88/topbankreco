@@ -222,6 +222,7 @@ table.rlt tr:hover td{background:#f8fafc}
     <div class="tabs">
       <div class="tab on" id="tab-recon" onclick="sw('recon')">Reconciliation <span class="bdg" id="bdg-recon">0</span></div>
       <div class="tab" id="tab-matched" onclick="sw('matched')">Matched Items <span class="bdg" id="bdg-matched">0</span></div>
+      <div class="tab" id="tab-partial" onclick="sw('partial')">Matched Partially <span class="bdg" id="bdg-partial">0</span></div>
     </div>
 
     <div id="view-recon">
@@ -270,8 +271,17 @@ table.rlt tr:hover td{background:#f8fafc}
     <div id="view-matched" class="hidden">
       <div class="matched-card">
         <table class="mt">
-          <thead><tr><th>#</th><th>Bank Items</th><th>Ledger Items</th><th>Matched By</th><th>Date Matched</th><th>Type</th><th>Kind</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Bank Items</th><th>Ledger Items</th><th>Matched By</th><th>Date Matched</th><th>Tags</th><th></th></tr></thead>
           <tbody id="matched-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="view-partial" class="hidden">
+      <div class="matched-card">
+        <table class="mt">
+          <thead><tr><th>#</th><th>Bank Items</th><th>Ledger Items</th><th>Matched By</th><th>Date Matched</th><th>Tags</th><th></th></tr></thead>
+          <tbody id="partial-body"></tbody>
         </table>
       </div>
     </div>
@@ -671,6 +681,7 @@ function updateBal(){
 function updateBadges(){
   document.getElementById('bdg-recon').textContent=bankLines.length+ledgerItems.length;
   document.getElementById('bdg-matched').textContent=matched.length;
+  document.getElementById('bdg-partial').textContent=matched.filter(m=>m.type==='partial').length;
 }
 
 function runSuggest(){
@@ -802,7 +813,7 @@ function matchGroup(gi){
   ledgerItems=ledgerItems.filter(l=>!g.ledgerIds.includes(l.id));
   suggGroups.splice(gi,1);
   if(!suggGroups.length)sugDone=false;
-  render();renderMatched();updateBadges();
+  render();renderMatched();renderPartialView();updateBadges();
   toast('Group confirmed ✓');
 }
 
@@ -826,7 +837,7 @@ function writeOff(bankId,ledgerId){
     if(!g.bankIds.length)suggGroups.splice(gi,1);
   }
   if(!suggGroups.length)sugDone=false;
-  render();renderMatched();updateBadges();
+  render();renderMatched();renderPartialView();updateBadges();
   toast('Write-off confirmed ✓');
 }
 
@@ -855,40 +866,51 @@ function keepOpen(bankId,ledgerId){
     if(!g.bankIds.length)suggGroups.splice(gi,1);
   }
   if(!suggGroups.length)sugDone=false;
-  render();renderMatched();updateBadges();
+  render();renderMatched();renderPartialView();updateBadges();
   toast('Marked as partial payment ✓','blue');
 }
 
+function matchedRowHtml(m){
+  const bHtml=m.banks.map((b,i)=>`<div style="padding:4px 0${i<m.banks.length-1?';border-bottom:1px solid #f1f5f9':''}">
+    <div style="font-weight:600;color:var(--black);font-size:12px">${b.desc}</div>
+    <div style="font-size:10px;color:var(--subtle);margin-top:1px">${b.date} &nbsp;·&nbsp; ${fmtC(b.amount,b.cur)} &nbsp;·&nbsp; ${b.cat}</div>
+  </div>`).join('');
+  const lHtml=m.ledgers.map((l,i)=>`<div style="padding:4px 0${i<m.ledgers.length-1?';border-bottom:1px solid #f1f5f9':''}">
+    <div style="font-weight:600;color:var(--black);font-size:12px">${l.desc}</div>
+    <div style="font-size:10px;color:var(--subtle);margin-top:1px">${l.date} &nbsp;·&nbsp; ${fmtC(l.amount,l.cur)} &nbsp;·&nbsp; ${l.cat}</div>
+  </div>`).join('');
+  const typeCls=m.type==='suggestion'?'tg-sug':m.type==='partial'?'tg-partial':'tg-manual';
+  const typeLabel=m.type==='partial'?'Partially Matched':m.type==='suggestion'?'Suggestion':'Manual';
+  return `<tr>
+    <td style="color:var(--subtle);font-weight:600;white-space:nowrap;vertical-align:top;padding-top:10px">#${m.id}</td>
+    <td style="vertical-align:top">${bHtml}</td>
+    <td style="vertical-align:top">${lHtml}</td>
+    <td style="vertical-align:top;padding-top:10px;white-space:nowrap">
+      <div style="display:flex;align-items:center;gap:5px">
+        <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--od));display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;flex-shrink:0">IT</div>
+        <span style="font-size:11px;color:var(--ink2)">Bookkeeper</span>
+      </div>
+    </td>
+    <td style="color:var(--muted);white-space:nowrap;font-size:11px;vertical-align:top;padding-top:10px">${m.on}</td>
+    <td style="vertical-align:top;padding-top:8px">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
+        <span class="tag ${typeCls}">${typeLabel}</span>
+        <span class="tag tg-info">${m.kind}</span>
+        ${m.fxTag?`<span class="tag ${m.fxTag==='FX Loss'?'tg-famt':'tg-sug'}">${m.fxTag}</span>`:''}
+      </div>
+    </td>
+    <td style="vertical-align:top;padding-top:8px"><button class="btn-danger-sm" onclick="revertMatch(${m.id})">Revert</button></td>
+  </tr>`;
+}
+const _emptyMatched=`<tr><td colspan="7"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;
 function renderMatched(){
   const body=document.getElementById('matched-body');
-  if(!matched.length){body.innerHTML=`<tr><td colspan="8"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;return;}
-  body.innerHTML=matched.map(m=>{
-    const bHtml=m.banks.map((b,i)=>`<div style="padding:4px 0${i<m.banks.length-1?';border-bottom:1px solid #f1f5f9':''}">
-      <div style="font-weight:600;color:var(--black);font-size:12px">${b.desc}</div>
-      <div style="font-size:10px;color:var(--subtle);margin-top:1px">${b.date} &nbsp;·&nbsp; ${fmtC(b.amount,b.cur)} &nbsp;·&nbsp; ${b.cat}</div>
-    </div>`).join('');
-    const lHtml=m.ledgers.map((l,i)=>`<div style="padding:4px 0${i<m.ledgers.length-1?';border-bottom:1px solid #f1f5f9':''}">
-      <div style="font-weight:600;color:var(--black);font-size:12px">${l.desc}</div>
-      <div style="font-size:10px;color:var(--subtle);margin-top:1px">${l.date} &nbsp;·&nbsp; ${fmtC(l.amount,l.cur)} &nbsp;·&nbsp; ${l.cat}</div>
-    </div>`).join('');
-    const typeCls=m.type==='suggestion'?'tg-sug':m.type==='partial'?'tg-partial':'tg-manual';
-    const typeLabel=m.type==='partial'?'Partially Paid':m.type==='suggestion'?'Suggestion':'Manual';
-    return `<tr>
-      <td style="color:var(--subtle);font-weight:600;white-space:nowrap;vertical-align:top;padding-top:10px">#${m.id}</td>
-      <td style="vertical-align:top">${bHtml}</td>
-      <td style="vertical-align:top">${lHtml}</td>
-      <td style="vertical-align:top;padding-top:10px;white-space:nowrap">
-        <div style="display:flex;align-items:center;gap:5px">
-          <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--od));display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;flex-shrink:0">IT</div>
-          <span style="font-size:11px;color:var(--ink2)">Bookkeeper</span>
-        </div>
-      </td>
-      <td style="color:var(--muted);white-space:nowrap;font-size:11px;vertical-align:top;padding-top:10px">${m.on}</td>
-      <td style="vertical-align:top;padding-top:10px"><div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px"><span class="tag ${typeCls}">${typeLabel}</span>${m.fxTag?`<span class="tag ${m.fxTag==='FX Loss'?'tg-famt':'tg-sug'}">${m.fxTag}</span>`:''}</div></td>
-      <td style="vertical-align:top;padding-top:10px"><span class="tag tg-info">${m.kind}</span></td>
-      <td style="vertical-align:top;padding-top:8px"><button class="btn-danger-sm" onclick="revertMatch(${m.id})">Revert</button></td>
-    </tr>`;
-  }).join('');
+  body.innerHTML=matched.length?matched.map(matchedRowHtml).join(''):_emptyMatched;
+}
+function renderPartialView(){
+  const body=document.getElementById('partial-body');
+  const items=matched.filter(m=>m.type==='partial');
+  body.innerHTML=items.length?items.map(matchedRowHtml).join(''):_emptyMatched;
 }
 function revertMatch(id){
   const m=matched.find(p=>p.id===id);if(!m)return;
@@ -896,13 +918,14 @@ function revertMatch(id){
   m.banks.forEach(b=>bankLines.push({...b,chk:false}));
   m.ledgers.forEach(l=>ledgerItems.push({...l,chk:false}));
   matched=matched.filter(p=>p.id!==id);
-  renderMatched();render();updateBadges();
+  renderMatched();renderPartialView();render();updateBadges();
   toast('Match reverted — re-match manually if needed','blue');
 }
 
 function sw(t){
-  ['recon','matched'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('on',x===t);document.getElementById('view-'+x).classList.toggle('hidden',x!==t);});
+  ['recon','matched','partial'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('on',x===t);document.getElementById('view-'+x).classList.toggle('hidden',x!==t);});
   if(t==='matched')renderMatched();
+  if(t==='partial')renderPartialView();
 }
 function openRules(){renderRules();document.getElementById('rules-modal').classList.add('on');}
 function closeRules(){document.getElementById('rules-modal').classList.remove('on');document.getElementById('rule-form').classList.remove('on');}
@@ -972,7 +995,7 @@ function closeCtxMenu(){document.getElementById('ctx-menu').style.display='none'
 function ctxAddLedger(){const id=_ctxBankId;closeCtxMenu();openFly(id);}
 document.addEventListener('click',closeCtxMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtxMenu();});
-render();updateBadges();renderMatched();
+render();updateBadges();renderMatched();renderPartialView();
 </script>
 </body>
 </html>
