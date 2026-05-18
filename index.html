@@ -230,8 +230,6 @@ table.rlt tr:hover td{background:#f8fafc}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>Auto-Suggest</button>
         <button class="btn btn-outline" onclick="openRules()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>Rules</button>
-        <button class="btn btn-outline" onclick="openFly()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Ledger Item</button>
       </div>
       <div class="bal-bar">
         <div class="bal-item"><div class="bal-lbl">Selected Bank</div><div class="bal-val" id="bv-bank">—</div></div>
@@ -272,7 +270,7 @@ table.rlt tr:hover td{background:#f8fafc}
     <div id="view-matched" class="hidden">
       <div class="matched-card">
         <table class="mt">
-          <thead><tr><th>#</th><th>Date</th><th>Bank Line(s)</th><th>Ledger Item(s)</th><th>Amount</th><th>How</th><th>Kind</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Bank Items</th><th>Ledger Items</th><th>Matched By</th><th>Date Matched</th><th>Type</th><th>Kind</th><th></th></tr></thead>
           <tbody id="matched-body"></tbody>
         </table>
       </div>
@@ -424,7 +422,7 @@ let rules=[
   {id:'r3',bdesc:'ZOOM',   bcat:'Software', tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Zoom video subscription',   lcat:'Comms'},
   {id:'r4',bdesc:'WOLT',   bcat:'Dining',   tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Team lunch / catering',     lcat:'Dining'},
 ];
-let matched=[],suggGroups=[],matchCounter=0,sugDone=false,dismissed=new Set();
+let matched=[],suggGroups=[],matchCounter=0,sugDone=false,dismissed=new Set(),reverted=new Set();
 
 const fmt=n=>'₪ '+new Intl.NumberFormat('en-IL').format(n);
 const fmtC=(n,cur)=>(cur==='USD'?'$ ':cur==='EUR'?'€ ':'₪ ')+new Intl.NumberFormat('en-IL').format(n);
@@ -690,7 +688,7 @@ function runSuggest(){
       if(usedB.has(b.id))return;
       ledgerItems.forEach(l=>{
         if(usedL.has(l.id)||usedB.has(b.id))return;
-        if(b.amount===l.amount&&b.cur===l.cur&&dayDiff(b.date,l.date)<=1){
+        if(b.amount===l.amount&&b.cur===l.cur&&dayDiff(b.date,l.date)<=1&&!reverted.has(b.id+':'+l.id)){
           fullG.bankIds.push(b.id);fullG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
@@ -706,7 +704,7 @@ function runSuggest(){
         if(usedL.has(l.id)||usedB.has(b.id))return;
         const lw=l.desc.toLowerCase().split(/\W+/).filter(w=>w.length>3);
         const ov=bw.some(w=>lw.some(x=>x.includes(w)||w.includes(x)));
-        if(ov&&Math.abs(b.amount-l.amount)/b.amount<0.05&&dayDiff(b.date,l.date)<=3){
+        if(ov&&Math.abs(b.amount-l.amount)/b.amount<0.05&&dayDiff(b.date,l.date)<=3&&!reverted.has(b.id+':'+l.id)){
           ftxtG.bankIds.push(b.id);ftxtG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
@@ -720,7 +718,7 @@ function runSuggest(){
       ledgerItems.forEach(l=>{
         if(usedL.has(l.id)||usedB.has(b.id))return;
         const co=b.cat.split(' ')[0].toLowerCase()===l.cat.split(' ')[0].toLowerCase();
-        if(co&&b.cur===l.cur&&!dismissed.has(b.id+':'+l.id)&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
+        if(co&&b.cur===l.cur&&!dismissed.has(b.id+':'+l.id)&&!reverted.has(b.id+':'+l.id)&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
           famtG.bankIds.push(b.id);famtG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
@@ -733,7 +731,7 @@ function runSuggest(){
       if(usedB.has(b.id))return;
       const ca=ledgerItems.filter(l=>!usedL.has(l.id)&&l.cur===b.cur&&dayDiff(b.date,l.date)<=5);
       for(let i=0;i<ca.length;i++)for(let j=i+1;j<ca.length;j++){
-        if(Math.abs(ca[i].amount+ca[j].amount-b.amount)<0.01){
+        if(Math.abs(ca[i].amount+ca[j].amount-b.amount)<0.01&&!reverted.has(b.id+':'+ca[i].id)&&!reverted.has(b.id+':'+ca[j].id)){
           onemanyG.subMatches.push({bankIds:[b.id],ledgerIds:[ca[i].id,ca[j].id]});
           onemanyG.bankIds.push(b.id);onemanyG.ledgerIds.push(ca[i].id,ca[j].id);
           usedB.add(b.id);usedL.add(ca[i].id);usedL.add(ca[j].id);return;
@@ -747,7 +745,7 @@ function runSuggest(){
       if(usedL.has(l.id))return;
       const ca=bankLines.filter(b=>!usedB.has(b.id)&&b.cur===l.cur&&dayDiff(b.date,l.date)<=5);
       for(let i=0;i<ca.length;i++)for(let j=i+1;j<ca.length;j++){
-        if(Math.abs(ca[i].amount+ca[j].amount-l.amount)<0.01){
+        if(Math.abs(ca[i].amount+ca[j].amount-l.amount)<0.01&&!reverted.has(ca[i].id+':'+l.id)&&!reverted.has(ca[j].id+':'+l.id)){
           many1G.subMatches.push({bankIds:[ca[i].id,ca[j].id],ledgerIds:[l.id]});
           many1G.bankIds.push(ca[i].id,ca[j].id);many1G.ledgerIds.push(l.id);
           usedB.add(ca[i].id);usedB.add(ca[j].id);usedL.add(l.id);return;
@@ -765,7 +763,7 @@ function runSuggest(){
         const am=!r.bacc||b.acc===r.bacc;
         const lo=!r.amin||b.amount>=parseFloat(r.amin);
         const hi=!r.amax||b.amount<=parseFloat(r.amax);
-        if(dm&&cm&&am&&lo&&hi){
+        if(dm&&cm&&am&&lo&&hi&&!reverted.has(b.id+':pl_'+b.id)){
           rrows.push({bankId:b.id,proposed:{id:'pl_'+b.id,date:b.date,amount:b.amount,cur:b.cur,cat:r.lcat||r.bcat,desc:(r.ldesc||r.bdesc)+' (proposed)',acc:'AUTO'},ruleCat:r.lcat||r.bcat});
           usedB.add(b.id);break;
         }
@@ -857,24 +855,42 @@ function keepOpen(bankId,ledgerId){
 function renderMatched(){
   const body=document.getElementById('matched-body');
   if(!matched.length){body.innerHTML=`<tr><td colspan="8"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;return;}
-  body.innerHTML=matched.map(m=>`<tr>
-    <td style="color:var(--subtle);font-weight:600">#${m.id}</td>
-    <td style="color:var(--muted)">${m.on}</td>
-    <td><div class="pl">${m.banks.map(b=>`<strong>${b.desc}</strong>`).join('<br>')}<span>${m.banks.map(b=>b.date+' · '+b.cat).join(' / ')}</span></div></td>
-    <td><div class="pl">${m.ledgers.map(l=>`<strong>${l.desc}</strong>`).join('<br>')}<span>${m.ledgers.map(l=>l.date+' · '+l.cat).join(' / ')}</span></div></td>
-    <td style="font-weight:700;color:var(--black)">${fmt(m.banks.reduce((a,b)=>a+b.amount,0))}</td>
-    <td><span class="tag ${m.type==='suggestion'?'tg-sug':m.type==='partial'?'tg-partial':'tg-manual'}">${m.type==='partial'?'partial':m.type}</span></td>
-    <td><span class="tag tg-info">${m.kind}</span></td>
-    <td><button class="btn-danger-sm" onclick="cancelMatch(${m.id})">Cancel</button></td>
-  </tr>`).join('');
+  body.innerHTML=matched.map(m=>{
+    const bHtml=m.banks.map((b,i)=>`<div style="padding:4px 0${i<m.banks.length-1?';border-bottom:1px solid #f1f5f9':''}">
+      <div style="font-weight:600;color:var(--black);font-size:12px">${b.desc}</div>
+      <div style="font-size:10px;color:var(--subtle);margin-top:1px">${b.date} &nbsp;·&nbsp; ${fmtC(b.amount,b.cur)} &nbsp;·&nbsp; ${b.cat}</div>
+    </div>`).join('');
+    const lHtml=m.ledgers.map((l,i)=>`<div style="padding:4px 0${i<m.ledgers.length-1?';border-bottom:1px solid #f1f5f9':''}">
+      <div style="font-weight:600;color:var(--black);font-size:12px">${l.desc}</div>
+      <div style="font-size:10px;color:var(--subtle);margin-top:1px">${l.date} &nbsp;·&nbsp; ${fmtC(l.amount,l.cur)} &nbsp;·&nbsp; ${l.cat}</div>
+    </div>`).join('');
+    const typeCls=m.type==='suggestion'?'tg-sug':m.type==='partial'?'tg-partial':'tg-manual';
+    const typeLabel=m.type==='partial'?'Partially Paid':m.type==='suggestion'?'Suggestion':'Manual';
+    return `<tr>
+      <td style="color:var(--subtle);font-weight:600;white-space:nowrap;vertical-align:top;padding-top:10px">#${m.id}</td>
+      <td style="vertical-align:top">${bHtml}</td>
+      <td style="vertical-align:top">${lHtml}</td>
+      <td style="vertical-align:top;padding-top:10px;white-space:nowrap">
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--od));display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;flex-shrink:0">IT</div>
+          <span style="font-size:11px;color:var(--ink2)">Bookkeeper</span>
+        </div>
+      </td>
+      <td style="color:var(--muted);white-space:nowrap;font-size:11px;vertical-align:top;padding-top:10px">${m.on}</td>
+      <td style="vertical-align:top;padding-top:10px"><span class="tag ${typeCls}">${typeLabel}</span></td>
+      <td style="vertical-align:top;padding-top:10px"><span class="tag tg-info">${m.kind}</span></td>
+      <td style="vertical-align:top;padding-top:8px"><button class="btn-danger-sm" onclick="revertMatch(${m.id})">Revert</button></td>
+    </tr>`;
+  }).join('');
 }
-function cancelMatch(id){
+function revertMatch(id){
   const m=matched.find(p=>p.id===id);if(!m)return;
+  m.banks.forEach(b=>m.ledgers.forEach(l=>reverted.add(b.id+':'+l.id)));
   m.banks.forEach(b=>bankLines.push({...b,chk:false}));
   m.ledgers.forEach(l=>ledgerItems.push({...l,chk:false}));
   matched=matched.filter(p=>p.id!==id);
   renderMatched();render();updateBadges();
-  toast('Match cancelled','blue');
+  toast('Match reverted — re-match manually if needed','blue');
 }
 
 function sw(t){
