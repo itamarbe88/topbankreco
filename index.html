@@ -402,7 +402,7 @@ let ledgerItems=[
   {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
   {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
   {id:'l21',date:'2024-05-10',amount:3000, cur:'ILS',cat:'Revenue',        desc:'One-time vendor service fee',acc:'REV-002',type:'credit',fxAmt:1000,fxCur:'USD',fxRate:3.00,chk:false},
-  {id:'l23',date:'2024-05-15',amount:10000,   cur:'USD',cat:'Transfer',        desc:'JE-1001/L-02 Wire sent',         acc:'JE1001-L02',  type:'credit',amtColor:'var(--red)',chk:false},
+  {id:'l23',date:'2024-05-15',amount:10000,   cur:'USD',cat:'Transfer',        desc:'JE-1001/L-02 Wire sent',         acc:'JE1001-L02',  type:'credit',amtColor:'var(--red)',noFx:true,chk:false},
   {id:'l24',date:'2024-05-15',amount:36500,   cur:'ILS',cat:'Cash-in-Transit', desc:'JE-1001/L-01 Cash-in-Transit',   acc:'JE1001-L01',  type:'debit', fxAmt:10000,fxCur:'USD',fxRate:3.65,amtColor:'var(--green)',chk:false},
   // 1:Many ×2
   {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
@@ -603,7 +603,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null,allowCtxM
   } else if(l){
     const lc=l.amtColor||(l.type==='credit'?'var(--green)':'var(--red)');
     lH=`<td class="ed" contenteditable="true" onblur="editL('date','${l.id}',this)">${l.date}</td>
-      <td class="amt ed" style="color:${lc};line-height:1.6"><span contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmtC(l.amount,l.cur)}</span>${l.fxAmt?`<br><span style="color:${l.fxColor||'var(--subtle)'};font-size:10px;font-weight:500">${l.fxAmt.toLocaleString()} ${l.fxCur} · 1=${l.fxRate}</span>`:(l.cur!=='ILS'&&FX_RATES[l.cur]?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(l.amount*FX_RATES[l.cur]))}</span>`:'')}</td>
+      <td class="amt ed" style="color:${lc};line-height:1.6"><span contenteditable="true" onblur="editL('amount','${l.id}',this)">${fmtC(l.amount,l.cur)}</span>${l.fxAmt?`<br><span style="color:${l.fxColor||'var(--subtle)'};font-size:10px;font-weight:500">${l.fxAmt.toLocaleString()} ${l.fxCur} · 1=${l.fxRate}</span>`:(l.cur!=='ILS'&&FX_RATES[l.cur]&&!l.noFx?`<br><span style="color:var(--subtle);font-size:10px;font-weight:500">≈ ${fmt(Math.round(l.amount*FX_RATES[l.cur]))}</span>`:'')}</td>
       <td>${l.cur}</td>
       <td class="ed" contenteditable="true" onblur="editL('cat','${l.id}',this)">${l.cat}</td>
       <td class="ed" contenteditable="true" onblur="editL('desc','${l.id}',this)" title="${l.desc}">${l.desc}</td>
