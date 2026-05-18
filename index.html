@@ -802,17 +802,27 @@ function runSuggest(){
 
 function matchGroup(gi){
   const g=suggGroups[gi];if(!g)return;
-  const bItems=g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
-  let lItems;
+  const now=new Date().toLocaleDateString('en-GB');
+  const kind=GM[g.type]?.label||g.type;
   if(g.type==='rule'){
     g.proposedLedgers.forEach(pl=>{if(!ledgerItems.find(x=>x.id===pl.id))ledgerItems.push({...pl,chk:false});});
     g.ledgerIds=g.proposedLedgers.map(p=>p.id);
-    lItems=g.proposedLedgers.map(pl=>ledgerItems.find(x=>x.id===pl.id)).filter(Boolean);
+    g.bankIds.forEach((bid,i)=>{
+      const b=bankLines.find(x=>x.id===bid),l=ledgerItems.find(x=>x.id===g.ledgerIds[i]);
+      if(b&&l){matchCounter++;matched.push({id:matchCounter,on:now,banks:[b],ledgers:[l],type:'suggestion',source:'suggestion',kind});}
+    });
+  } else if(g.subMatches){
+    g.subMatches.forEach(sm=>{
+      const bs=sm.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
+      const ls=sm.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
+      if(bs.length&&ls.length){matchCounter++;matched.push({id:matchCounter,on:now,banks:bs,ledgers:ls,type:'suggestion',source:'suggestion',kind});}
+    });
   } else {
-    lItems=g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
+    g.bankIds.forEach((bid,i)=>{
+      const b=bankLines.find(x=>x.id===bid),l=ledgerItems.find(x=>x.id===g.ledgerIds[i]);
+      if(b&&l){matchCounter++;matched.push({id:matchCounter,on:now,banks:[b],ledgers:[l],type:'suggestion',source:'suggestion',kind});}
+    });
   }
-  matchCounter++;
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:bItems,ledgers:lItems,type:'suggestion',kind:GM[g.type]?.label||g.type});
   bankLines=bankLines.filter(b=>!g.bankIds.includes(b.id));
   ledgerItems=ledgerItems.filter(l=>!g.ledgerIds.includes(l.id));
   suggGroups.splice(gi,1);
