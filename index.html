@@ -104,7 +104,7 @@ table.ut tbody td{padding:8px 10px;color:var(--ink2);white-space:nowrap;overflow
 table.ut tbody td.chk{padding-left:12px;width:32px}
 table.ut tbody td.amt{font-weight:700;color:var(--black);font-variant-numeric:tabular-nums}
 table.ut tbody td.dim{color:var(--subtle);font-size:11px}
-table.ut tbody td.ctr{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);text-align:center;background:#fafbfc;width:88px;line-height:1.6;padding:6px 4px}
+table.ut tbody td.ctr{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);text-align:center;background:#fafbfc;width:88px;line-height:1.6;padding:6px 4px;vertical-align:middle}
 table.ut tbody tr.gh td{padding:8px 12px;background:#f8fafc;border-top:2px solid var(--border);border-bottom:1px solid var(--border)}
 table.ut tbody tr.gh td.ctr{border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);background:#f8fafc}
 table.ut tbody tr.gf td{padding:6px 10px;background:#fafcff;border-top:1px dashed var(--border);border-bottom:2px solid var(--border)}
@@ -347,9 +347,11 @@ table.rlt tr:hover td{background:#f8fafc}
 
 <script>
 let bankLines=[
-  // 1:1 Full Parity ×2
-  {id:'b1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Supplies',desc:'STAPLES STORE',    bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
-  {id:'b11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',      desc:'OFFICE DEPOT',      bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  // 1:1 Full Parity ×4 (2 debit + 2 credit/incoming)
+  {id:'b1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Supplies',desc:'STAPLES STORE',     bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',      desc:'OFFICE DEPOT',       bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  {id:'b19',date:'2024-05-03',amount:4500, cur:'ILS',cat:'Revenue',        desc:'CUSTOMER PAYMENT',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'credit',chk:false},
+  {id:'b20',date:'2024-05-10',amount:7200, cur:'ILS',cat:'Revenue',        desc:'WIRE TRANSFER IN',   bank:'Bank Hapoalim',acc:'IL-456-7890',type:'credit',chk:false},
   // 1:1 Fuzzy Text ×2
   {id:'b2', date:'2024-05-02',amount:8000, cur:'ILS',cat:'Payroll',        desc:'SALARY PROCESSING', bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
   {id:'b12',date:'2024-05-16',amount:12000,cur:'ILS',cat:'Payroll',        desc:'SALARY BATCH',      bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
@@ -374,9 +376,11 @@ let bankLines=[
   {id:'b10',date:'2024-05-14',amount:220,  cur:'ILS',cat:'Transport',      desc:'FUEL STATION',      bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
 ];
 let ledgerItems=[
-  // 1:1 Full Parity ×2
-  {id:'l1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Expenses', desc:'Stationery purchase',       acc:'EXP-001',type:'debit', chk:false},
+  // 1:1 Full Parity ×4 (2 debit + 2 credit/incoming)
+  {id:'l1', date:'2024-05-01',amount:1500, cur:'ILS',cat:'Office Expenses', desc:'Stationery purchase',        acc:'EXP-001',type:'debit', chk:false},
   {id:'l11',date:'2024-05-15',amount:3200, cur:'ILS',cat:'Equipment',       desc:'Office equipment purchase',  acc:'EQP-001',type:'debit', chk:false},
+  {id:'l19',date:'2024-05-03',amount:4500, cur:'ILS',cat:'Revenue',         desc:'Customer invoice #1042',     acc:'REV-001',type:'credit',chk:false},
+  {id:'l20',date:'2024-05-10',amount:7200, cur:'ILS',cat:'Revenue',         desc:'Project milestone receipt',  acc:'REV-001',type:'credit',chk:false},
   // 1:1 Fuzzy Text ×2
   {id:'l2', date:'2024-05-04',amount:8000, cur:'ILS',cat:'Salaries',        desc:'May salary disbursement',   acc:'SAL-001',type:'debit', chk:false},
   {id:'l12',date:'2024-05-18',amount:12000,cur:'ILS',cat:'Salaries',        desc:'June salary disbursement',  acc:'SAL-001',type:'debit', chk:false},
@@ -433,13 +437,16 @@ function render(){
       // group header
       const hr=document.createElement('tr');hr.className='gh';
       hr.innerHTML=`<td colspan="8" style="padding:8px 12px">
-        <span class="tag ${meta.cls}" style="font-size:11px;padding:3px 10px;margin-right:8px">${meta.icon} ${meta.label}</span>
-        <span style="font-size:11px;color:var(--muted);font-weight:500">${bItems.length} bank · ${lItems.length} ledger${isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>':''}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--ink2);margin-right:6px">${meta.label}</span>
+        <span style="font-size:11px;color:var(--muted);font-weight:400">${bItems.length} bank · ${lItems.length} ledger${isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>':''}</span>
       </td><td class="ctr"></td><td colspan="7"></td>`;
       body.appendChild(hr);
       // rows
       const rc=Math.max(bItems.length,lItems.length);
-      for(let i=0;i<rc;i++) body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,isR?g.type:(i===0?g.type:'__cont'),isR?(g.ruleCats&&g.ruleCats[i]):null,isR));
+      for(let i=0;i<rc;i++){
+        const rs=isR?1:(i===0?rc:0);
+        body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,isR?g.type:(i===0?g.type:'__cont'),isR?(g.ruleCats&&g.ruleCats[i]):null,isR,rs));
+      }
       // footer
       const fr=document.createElement('tr');fr.className='gf';
       let bh;
@@ -472,14 +479,17 @@ function render(){
   updateBal();updateBadges();
 }
 
-function mkRow(b,l,tag,ruleCat,isP){
+function mkRow(b,l,tag,ruleCat,isP,rs=1){
   const tr=document.createElement('tr');
   if((b&&b.chk)||(l&&l.chk))tr.classList.add('sel');
   let ctr='';
   if(tag&&tag!=='__cont'){
     const m=GM[tag];
     if(ruleCat){
-      ctr=`<span class="tag tg-rule" style="font-size:10px;white-space:nowrap">Rule-Based · ${ruleCat}</span>`;
+      ctr=`<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <span class="tag tg-rule" style="font-size:10px">Rule-Based</span>
+        <span class="tag tg-info" style="font-size:10px">${ruleCat}</span>
+      </div>`;
     } else if(m){
       ctr=`<span class="tag ${m.cls}" style="font-size:10px">${m.label}</span>`;
     }
@@ -511,7 +521,8 @@ function mkRow(b,l,tag,ruleCat,isP){
   } else {
     lH=`<td></td><td></td><td></td><td></td><td></td><td></td><td class="chk"></td>`;
   }
-  tr.innerHTML=bH+`<td class="ctr">${ctr}</td>`+lH;
+  const ctrHtml=rs===0?'':`<td class="ctr"${rs>1?` rowspan="${rs}"`:''}>${ctr}</td>`;
+  tr.innerHTML=bH+ctrHtml+lH;
   return tr;
 }
 
