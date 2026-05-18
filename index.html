@@ -224,6 +224,7 @@ table.rlt tr:hover td{background:#f8fafc}
       <div class="tab on" id="tab-recon" onclick="sw('recon')">Reconciliation <span class="bdg" id="bdg-recon">0</span></div>
       <div class="tab" id="tab-matched" onclick="sw('matched')">Matched Items <span class="bdg" id="bdg-matched">0</span></div>
       <div class="tab" id="tab-partial" onclick="sw('partial')"><span id="tab-partial-lbl">Matched Partially</span> <span class="bdg" id="bdg-partial">0</span></div>
+      <div class="tab" id="tab-writeoff" onclick="sw('writeoff')">Write-offs <span class="bdg" id="bdg-writeoff">0</span></div>
     </div>
 
     <div id="view-recon">
@@ -283,6 +284,15 @@ table.rlt tr:hover td{background:#f8fafc}
         <table class="mt">
           <thead><tr><th>#</th><th>Bank Items</th><th>Ledger Items</th><th>Matched By</th><th>Date Matched</th><th>Tags</th><th></th></tr></thead>
           <tbody id="partial-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="view-writeoff" class="hidden">
+      <div class="matched-card">
+        <table class="mt">
+          <thead><tr><th>#</th><th>Bank Items</th><th>Ledger Items</th><th>Matched By</th><th>Date Matched</th><th>Tags</th><th></th></tr></thead>
+          <tbody id="writeoff-body"></tbody>
         </table>
       </div>
     </div>
@@ -681,11 +691,12 @@ function updateBal(){
 }
 function updateBadges(){
   document.getElementById('bdg-recon').textContent=bankLines.length+ledgerItems.length;
-  document.getElementById('bdg-matched').textContent=matched.filter(m=>m.type!=='partial').length;
+  document.getElementById('bdg-matched').textContent=matched.filter(m=>m.type!=='partial'&&m.type!=='writeoff').length;
   const pCount=matched.filter(m=>m.type==='partial').length;
   document.getElementById('bdg-partial').textContent=pCount;
   document.getElementById('tab-partial').classList.toggle('tab-alert',pCount>0);
   document.getElementById('tab-partial-lbl').textContent=pCount>0?'! Matched Partially':'Matched Partially';
+  document.getElementById('bdg-writeoff').textContent=matched.filter(m=>m.type==='writeoff').length;
 }
 
 function runSuggest(){
@@ -834,7 +845,7 @@ function matchGroup(gi){
   ledgerItems=ledgerItems.filter(l=>!confirmedL.has(l.id));
   suggGroups.splice(gi,1);
   if(!suggGroups.length)sugDone=false;
-  render();renderMatched();renderPartialView();updateBadges();
+  render();renderMatched();renderPartialView();renderWriteoffs();updateBadges();
   toast('Group confirmed ✓');
 }
 
@@ -847,7 +858,7 @@ function writeOff(bankId,ledgerId){
   const fxTag=b.fxAmt&&pFX>0.001?((b.type==='credit'?b.amount<l.amount:b.amount>l.amount)?'FX Loss':'FX Gain'):null;
   matchCounter++;
   const extras=diff>0.001?[{id:'wo_'+Date.now(),date:b.date,amount:diff,cur:b.cur,cat:'Write-off',desc:'Write-off adjustment',acc:'WO-001',type:'debit',chk:false}]:[];
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l,...extras],type:'suggestion',kind:'1:1 Fuzzy Amount',fxTag});
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l,...extras],type:'writeoff',source:'suggestion',kind:'1:1 Fuzzy Amount',fxTag});
   bankLines=bankLines.filter(x=>x.id!==bankId);
   ledgerItems=ledgerItems.filter(x=>x.id!==ledgerId);
   const gi=suggGroups.findIndex(g=>g.type==='famt');
@@ -858,7 +869,7 @@ function writeOff(bankId,ledgerId){
     if(!g.bankIds.length)suggGroups.splice(gi,1);
   }
   if(!suggGroups.length)sugDone=false;
-  render();renderMatched();renderPartialView();updateBadges();
+  render();renderMatched();renderPartialView();renderWriteoffs();updateBadges();
   toast('Write-off confirmed ✓');
 }
 
@@ -887,7 +898,7 @@ function keepOpen(bankId,ledgerId){
     if(!g.bankIds.length)suggGroups.splice(gi,1);
   }
   if(!suggGroups.length)sugDone=false;
-  render();renderMatched();renderPartialView();updateBadges();
+  render();renderMatched();renderPartialView();renderWriteoffs();updateBadges();
   toast('Marked as partial payment ✓','blue');
 }
 
@@ -919,6 +930,7 @@ function matchedRowHtml(m){
         <span class="tag ${typeCls}">${typeLabel}</span>
         <span class="tag tg-info">${m.kind}</span>
         ${m.type==='partial'?`<span class="tag tg-partial">Partially Paid</span>`:''}
+        ${m.type==='writeoff'?`<span class="tag tg-rule">Write-off</span>`:''}
         ${m.fxTag?`<span class="tag ${m.fxTag==='FX Loss'?'tg-famt':'tg-sug'}">${m.fxTag}</span>`:''}
       </div>
     </td>
@@ -928,12 +940,17 @@ function matchedRowHtml(m){
 const _emptyMatched=`<tr><td colspan="7"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;
 function renderMatched(){
   const body=document.getElementById('matched-body');
-  const items=matched.filter(m=>m.type!=='partial');
+  const items=matched.filter(m=>m.type!=='partial'&&m.type!=='writeoff');
   body.innerHTML=items.length?items.map(matchedRowHtml).join(''):_emptyMatched;
 }
 function renderPartialView(){
   const body=document.getElementById('partial-body');
   const items=matched.filter(m=>m.type==='partial');
+  body.innerHTML=items.length?items.map(matchedRowHtml).join(''):_emptyMatched;
+}
+function renderWriteoffs(){
+  const body=document.getElementById('writeoff-body');
+  const items=matched.filter(m=>m.type==='writeoff');
   body.innerHTML=items.length?items.map(matchedRowHtml).join(''):_emptyMatched;
 }
 function revertMatch(id){
@@ -942,14 +959,15 @@ function revertMatch(id){
   m.banks.forEach(b=>bankLines.push({...b,chk:false}));
   m.ledgers.forEach(l=>ledgerItems.push({...l,chk:false}));
   matched=matched.filter(p=>p.id!==id);
-  renderMatched();renderPartialView();render();updateBadges();
+  renderMatched();renderPartialView();renderWriteoffs();render();updateBadges();
   toast('Match reverted — re-match manually if needed','blue');
 }
 
 function sw(t){
-  ['recon','matched','partial'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('on',x===t);document.getElementById('view-'+x).classList.toggle('hidden',x!==t);});
+  ['recon','matched','partial','writeoff'].forEach(x=>{document.getElementById('tab-'+x).classList.toggle('on',x===t);document.getElementById('view-'+x).classList.toggle('hidden',x!==t);});
   if(t==='matched')renderMatched();
   if(t==='partial')renderPartialView();
+  if(t==='writeoff')renderWriteoffs();
 }
 function openRules(){renderRules();document.getElementById('rules-modal').classList.add('on');}
 function closeRules(){document.getElementById('rules-modal').classList.remove('on');document.getElementById('rule-form').classList.remove('on');}
@@ -1019,7 +1037,7 @@ function closeCtxMenu(){document.getElementById('ctx-menu').style.display='none'
 function ctxAddLedger(){const id=_ctxBankId;closeCtxMenu();openFly(id);}
 document.addEventListener('click',closeCtxMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtxMenu();});
-render();updateBadges();renderMatched();renderPartialView();
+render();updateBadges();renderMatched();renderPartialView();renderWriteoffs();
 </script>
 </body>
 </html>
