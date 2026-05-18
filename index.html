@@ -390,7 +390,7 @@ let ledgerItems=[
   // 1:1 Fuzzy Amount ×2  (ledger > bank)
   {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
   {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
-  {id:'l21',date:'2024-05-14',amount:1900, cur:'USD',cat:'SaaS',           desc:'Stripe platform fee',       acc:'SVC-002',type:'debit', chk:false},
+  {id:'l21',date:'2024-05-14',amount:1900, cur:'USD',cat:'SaaS',           desc:'Monthly subscription fee',  acc:'SVC-002',type:'debit', chk:false},
   // 1:Many ×2
   {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
   {id:'l5', date:'2024-05-05',amount:2000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 2',   acc:'CST-001',type:'debit', chk:false},
@@ -476,7 +476,8 @@ function render(){
           const b=bItems[i],l=lItems[i];
           const isFX=b&&b.cur!=='ILS';
           const ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
-            <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:76px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
+            <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:82px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
+            <button class="btn-danger-sm" style="font-size:10px;padding:3px 5px;width:82px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Partial Payment</button>
             <span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isFX?'FX':'Bank Fee'}</span>
           </div>`:'';
           body.appendChild(mkRow(b||null,l||null,null,null,false,1,false,ctr));
