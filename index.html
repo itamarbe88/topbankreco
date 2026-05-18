@@ -112,6 +112,7 @@ table.ut tbody tr.gf td.ctr{border-left:1.5px solid var(--border);border-right:1
 table.ut tbody td.ed{cursor:text}
 table.ut tbody td.ed:hover{background:rgba(249,115,22,.04)}
 .prop{color:var(--subtle)!important;opacity:.6;font-style:italic;background:#f8fafc}
+tr.sm-div td{border-top:2px solid var(--border)!important}
 input[type=checkbox]{width:13px;height:13px;cursor:pointer;accent-color:var(--orange)}
 .matched-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
 table.mt{width:100%;border-collapse:collapse;font-size:12px}
@@ -430,22 +431,51 @@ function render(){
     const usedB=new Set(suggGroups.flatMap(g=>g.bankIds));
     const usedL=new Set(suggGroups.flatMap(g=>g.ledgerIds||[]));
     suggGroups.forEach((g,gi)=>{
-      const meta=GM[g.type],isR=g.type==='rule';
+      const meta=GM[g.type],isR=g.type==='rule',isFamt=g.type==='famt';
       const bItems=g.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
       const lItems=isR?(g.proposedLedgers||[]):g.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
       const sumB=bItems.reduce((a,x)=>a+x.amount,0),sumL=lItems.reduce((a,x)=>a+x.amount,0),diff=Math.abs(sumB-sumL);
-      // group header
+      // group header — no tag badge, plain text label
       const hr=document.createElement('tr');hr.className='gh';
+      let hNote=isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>'
+               :isFamt?' · <i style="color:var(--amber)">write-off entry will be created for the difference on confirm</i>':'';
       hr.innerHTML=`<td colspan="8" style="padding:8px 12px">
         <span style="font-size:12px;font-weight:700;color:var(--ink2);margin-right:6px">${meta.label}</span>
-        <span style="font-size:11px;color:var(--muted);font-weight:400">${bItems.length} bank · ${lItems.length} ledger${isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>':''}</span>
+        <span style="font-size:11px;color:var(--muted);font-weight:400">${bItems.length} bank · ${lItems.length} ledger${hNote}</span>
       </td><td class="ctr"></td><td colspan="7"></td>`;
       body.appendChild(hr);
-      // rows
-      const rc=Math.max(bItems.length,lItems.length);
-      for(let i=0;i<rc;i++){
-        const rs=isR?1:(i===0?rc:0);
-        body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,isR?g.type:(i===0?g.type:'__cont'),isR?(g.ruleCats&&g.ruleCats[i]):null,isR,rs));
+      // rows — three rendering modes
+      if(g.subMatches){
+        // 1:Many / Many:1 merged group: render each sub-match separated by a divider line
+        const totalRows=g.subMatches.reduce((s,sm)=>s+Math.max(sm.bankIds.length,sm.ledgerIds.length),0);
+        let rowIdx=0;
+        g.subMatches.forEach((sm,smi)=>{
+          const smB=sm.bankIds.map(id=>bankLines.find(x=>x.id===id)).filter(Boolean);
+          const smL=sm.ledgerIds.map(id=>ledgerItems.find(x=>x.id===id)).filter(Boolean);
+          const smRc=Math.max(smB.length,smL.length);
+          for(let i=0;i<smRc;i++){
+            body.appendChild(mkRow(smB[i]||null,smL[i]||null,rowIdx===0?g.type:'__cont',null,false,rowIdx===0?totalRows:0,smi>0&&i===0));
+            rowIdx++;
+          }
+        });
+      } else if(isFamt){
+        // Fuzzy amount: per-row Write Off / Keep Open buttons, no group-level Confirm
+        const rc=Math.max(bItems.length,lItems.length);
+        for(let i=0;i<rc;i++){
+          const b=bItems[i],l=lItems[i];
+          const ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+            <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:76px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
+            <button class="btn-danger-sm" style="width:76px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Keep Open</button>
+          </div>`:'';
+          body.appendChild(mkRow(b||null,l||null,null,null,false,1,false,ctr));
+        }
+      } else {
+        // Default: full/ftxt/rule/many1 (non-subMatches)
+        const rc=Math.max(bItems.length,lItems.length);
+        for(let i=0;i<rc;i++){
+          const rs=isR?1:(i===0?rc:0);
+          body.appendChild(mkRow(bItems[i]||null,lItems[i]||null,isR?g.type:(i===0?g.type:'__cont'),isR?(g.ruleCats&&g.ruleCats[i]):null,isR,rs));
+        }
       }
       // footer
       const fr=document.createElement('tr');fr.className='gf';
@@ -453,13 +483,18 @@ function render(){
       if(isR) bh=`<span style="color:var(--green);font-weight:700;font-size:11px">✓ Balanced on confirm</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> = Proposed: <b>${fmt(sumL)}</b></span>`;
       else if(diff<0.01) bh=`<span style="color:var(--green);font-weight:700;font-size:11px">✓ Balanced</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> = Ledger: <b>${fmt(sumL)}</b></span>`;
       else bh=`<span style="color:var(--amber);font-weight:700;font-size:11px">≈ ${fmt(diff)} diff</span> <span style="font-size:10px;color:var(--muted);margin-left:6px">Bank: <b>${fmt(sumB)}</b> · Ledger: <b>${fmt(sumL)}</b></span>`;
-      fr.innerHTML=`<td colspan="5">${bh}</td>
-        <td colspan="3" style="text-align:right">
-          <button class="btn btn-success btn-sm" onclick="matchGroup(${gi})">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirm Match
-          </button>
-        </td>
-        <td class="ctr"></td><td colspan="7"></td>`;
+      if(isFamt){
+        // No Confirm button — handled per row
+        fr.innerHTML=`<td colspan="8">${bh}</td><td class="ctr"></td><td colspan="7"></td>`;
+      } else {
+        fr.innerHTML=`<td colspan="5">${bh}</td>
+          <td colspan="3" style="text-align:right">
+            <button class="btn btn-success btn-sm" onclick="matchGroup(${gi})">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirm Match
+            </button>
+          </td>
+          <td class="ctr"></td><td colspan="7"></td>`;
+      }
       body.appendChild(fr);
     });
     const unmB=bankLines.filter(b=>!usedB.has(b.id)),unmL=ledgerItems.filter(l=>!usedL.has(l.id));
@@ -479,9 +514,10 @@ function render(){
   updateBal();updateBadges();
 }
 
-function mkRow(b,l,tag,ruleCat,isP,rs=1){
+function mkRow(b,l,tag,ruleCat,isP,rs=1,subStart=false,ctrContent=null){
   const tr=document.createElement('tr');
   if((b&&b.chk)||(l&&l.chk))tr.classList.add('sel');
+  if(subStart)tr.classList.add('sm-div');
   let ctr='';
   if(tag&&tag!=='__cont'){
     const m=GM[tag];
@@ -521,6 +557,7 @@ function mkRow(b,l,tag,ruleCat,isP,rs=1){
   } else {
     lH=`<td></td><td></td><td></td><td></td><td></td><td></td><td class="chk"></td>`;
   }
+  if(ctrContent!==null)ctr=ctrContent;
   const ctrHtml=rs===0?'':`<td class="ctr"${rs>1?` rowspan="${rs}"`:''}>${ctr}</td>`;
   tr.innerHTML=bH+ctrHtml+lH;
   return tr;
@@ -615,28 +652,34 @@ function runSuggest(){
       });
     });
     if(famtG.bankIds.length) suggGroups.push(famtG);
-    // 4 1:many
+    // 4 1:many — all into ONE group with subMatches, visually separated
+    const onemanyG={type:'1many',subMatches:[],bankIds:[],ledgerIds:[]};
     bankLines.forEach(b=>{
       if(usedB.has(b.id))return;
       const ca=ledgerItems.filter(l=>!usedL.has(l.id)&&l.cur===b.cur&&dayDiff(b.date,l.date)<=5);
       for(let i=0;i<ca.length;i++)for(let j=i+1;j<ca.length;j++){
         if(Math.abs(ca[i].amount+ca[j].amount-b.amount)<0.01){
-          suggGroups.push({type:'1many',bankIds:[b.id],ledgerIds:[ca[i].id,ca[j].id]});
+          onemanyG.subMatches.push({bankIds:[b.id],ledgerIds:[ca[i].id,ca[j].id]});
+          onemanyG.bankIds.push(b.id);onemanyG.ledgerIds.push(ca[i].id,ca[j].id);
           usedB.add(b.id);usedL.add(ca[i].id);usedL.add(ca[j].id);return;
         }
       }
     });
-    // 5 many:1
+    if(onemanyG.subMatches.length) suggGroups.push(onemanyG);
+    // 5 many:1 — all into ONE group with subMatches, visually separated
+    const many1G={type:'many1',subMatches:[],bankIds:[],ledgerIds:[]};
     ledgerItems.forEach(l=>{
       if(usedL.has(l.id))return;
       const ca=bankLines.filter(b=>!usedB.has(b.id)&&b.cur===l.cur&&dayDiff(b.date,l.date)<=5);
       for(let i=0;i<ca.length;i++)for(let j=i+1;j<ca.length;j++){
         if(Math.abs(ca[i].amount+ca[j].amount-l.amount)<0.01){
-          suggGroups.push({type:'many1',bankIds:[ca[i].id,ca[j].id],ledgerIds:[l.id]});
+          many1G.subMatches.push({bankIds:[ca[i].id,ca[j].id],ledgerIds:[l.id]});
+          many1G.bankIds.push(ca[i].id,ca[j].id);many1G.ledgerIds.push(l.id);
           usedB.add(ca[i].id);usedB.add(ca[j].id);usedL.add(l.id);return;
         }
       }
     });
+    if(many1G.subMatches.length) suggGroups.push(many1G);
     // 6 rule-based — ALL into ONE group
     const rrows=[];
     bankLines.forEach(b=>{
@@ -688,6 +731,40 @@ function matchGroup(gi){
   if(!suggGroups.length)sugDone=false;
   render();renderMatched();updateBadges();
   toast('Group confirmed ✓');
+}
+
+function writeOff(bankId,ledgerId){
+  const b=bankLines.find(x=>x.id===bankId),l=ledgerItems.find(x=>x.id===ledgerId);
+  if(!b||!l)return;
+  const diff=Math.round(Math.abs(l.amount-b.amount)*100)/100;
+  matchCounter++;
+  const extras=diff>0.001?[{id:'wo_'+Date.now(),date:b.date,amount:diff,cur:b.cur,cat:'Write-off',desc:'Write-off adjustment',acc:'WO-001',type:'debit',chk:false}]:[];
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l,...extras],type:'suggestion',kind:'1:1 Fuzzy Amount'});
+  bankLines=bankLines.filter(x=>x.id!==bankId);
+  ledgerItems=ledgerItems.filter(x=>x.id!==ledgerId);
+  const gi=suggGroups.findIndex(g=>g.type==='famt');
+  if(gi>=0){
+    const g=suggGroups[gi];
+    const idx=g.bankIds.indexOf(bankId);
+    if(idx>=0){g.bankIds.splice(idx,1);g.ledgerIds.splice(idx,1);}
+    if(!g.bankIds.length)suggGroups.splice(gi,1);
+  }
+  if(!suggGroups.length)sugDone=false;
+  render();renderMatched();updateBadges();
+  toast('Write-off confirmed ✓');
+}
+
+function keepOpen(bankId,ledgerId){
+  const gi=suggGroups.findIndex(g=>g.type==='famt');
+  if(gi>=0){
+    const g=suggGroups[gi];
+    const idx=g.bankIds.indexOf(bankId);
+    if(idx>=0){g.bankIds.splice(idx,1);g.ledgerIds.splice(idx,1);}
+    if(!g.bankIds.length)suggGroups.splice(gi,1);
+  }
+  if(!suggGroups.length)sugDone=false;
+  render();updateBadges();
+  toast('Kept open — items returned to unmatched','blue');
 }
 
 function renderMatched(){
