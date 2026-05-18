@@ -45,6 +45,7 @@ select.biz:focus{outline:none;border-color:var(--orange)}
 .tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:14px}
 .tab{padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s;white-space:nowrap}
 .tab:hover{color:var(--ink2)}.tab.on{color:var(--orange);border-bottom-color:var(--orange)}
+.tab.tab-alert{color:var(--red)!important}.tab.tab-alert .bdg{background:var(--rl);color:var(--red)}
 .bdg{display:inline-block;background:#f1f5f9;color:var(--muted);border-radius:20px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px}
 .tab.on .bdg{background:var(--ol);color:var(--od)}
 .toolbar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
@@ -222,7 +223,7 @@ table.rlt tr:hover td{background:#f8fafc}
     <div class="tabs">
       <div class="tab on" id="tab-recon" onclick="sw('recon')">Reconciliation <span class="bdg" id="bdg-recon">0</span></div>
       <div class="tab" id="tab-matched" onclick="sw('matched')">Matched Items <span class="bdg" id="bdg-matched">0</span></div>
-      <div class="tab" id="tab-partial" onclick="sw('partial')">Matched Partially <span class="bdg" id="bdg-partial">0</span></div>
+      <div class="tab" id="tab-partial" onclick="sw('partial')"><span id="tab-partial-lbl">Matched Partially</span> <span class="bdg" id="bdg-partial">0</span></div>
     </div>
 
     <div id="view-recon">
@@ -680,8 +681,11 @@ function updateBal(){
 }
 function updateBadges(){
   document.getElementById('bdg-recon').textContent=bankLines.length+ledgerItems.length;
-  document.getElementById('bdg-matched').textContent=matched.length;
-  document.getElementById('bdg-partial').textContent=matched.filter(m=>m.type==='partial').length;
+  document.getElementById('bdg-matched').textContent=matched.filter(m=>m.type!=='partial').length;
+  const pCount=matched.filter(m=>m.type==='partial').length;
+  document.getElementById('bdg-partial').textContent=pCount;
+  document.getElementById('tab-partial').classList.toggle('tab-alert',pCount>0);
+  document.getElementById('tab-partial-lbl').textContent=pCount>0?'! Matched Partially':'Matched Partially';
 }
 
 function runSuggest(){
@@ -855,7 +859,7 @@ function keepOpen(bankId,ledgerId){
   const pFX=Math.max(0,Math.round((diff-pFee)*100)/100);
   const fxTag=b.fxAmt&&pFX>0.001?((b.type==='credit'?b.amount<l.amount:b.amount>l.amount)?'FX Loss':'FX Gain'):null;
   matchCounter++;
-  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l],type:'partial',kind:'Partially Paid',fxTag});
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l],type:'partial',source:'suggestion',kind:'1:1 Fuzzy Amount',fxTag});
   bankLines=bankLines.filter(x=>x.id!==bankId);
   ledgerItems=ledgerItems.filter(x=>x.id!==ledgerId);
   const gi=suggGroups.findIndex(g=>g.type==='famt');
@@ -879,8 +883,9 @@ function matchedRowHtml(m){
     <div style="font-weight:600;color:var(--black);font-size:12px">${l.desc}</div>
     <div style="font-size:10px;color:var(--subtle);margin-top:1px">${l.date} &nbsp;·&nbsp; ${fmtC(l.amount,l.cur)} &nbsp;·&nbsp; ${l.cat}</div>
   </div>`).join('');
-  const typeCls=m.type==='suggestion'?'tg-sug':m.type==='partial'?'tg-partial':'tg-manual';
-  const typeLabel=m.type==='partial'?'Partially Matched':m.type==='suggestion'?'Suggestion':'Manual';
+  const src=m.source||m.type;
+  const typeCls=src==='suggestion'?'tg-sug':'tg-manual';
+  const typeLabel=src==='suggestion'?'Suggestion':'Manual';
   return `<tr>
     <td style="color:var(--subtle);font-weight:600;white-space:nowrap;vertical-align:top;padding-top:10px">#${m.id}</td>
     <td style="vertical-align:top">${bHtml}</td>
@@ -905,7 +910,8 @@ function matchedRowHtml(m){
 const _emptyMatched=`<tr><td colspan="7"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p>No matched items yet.</p></div></td></tr>`;
 function renderMatched(){
   const body=document.getElementById('matched-body');
-  body.innerHTML=matched.length?matched.map(matchedRowHtml).join(''):_emptyMatched;
+  const items=matched.filter(m=>m.type!=='partial');
+  body.innerHTML=items.length?items.map(matchedRowHtml).join(''):_emptyMatched;
 }
 function renderPartialView(){
   const body=document.getElementById('partial-body');
