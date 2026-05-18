@@ -901,6 +901,7 @@ function matchedRowHtml(m){
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">
         <span class="tag ${typeCls}">${typeLabel}</span>
         <span class="tag tg-info">${m.kind}</span>
+        ${m.type==='partial'?`<span class="tag tg-partial">Partially Paid</span>`:''}
         ${m.fxTag?`<span class="tag ${m.fxTag==='FX Loss'?'tg-famt':'tg-sug'}">${m.fxTag}</span>`:''}
       </div>
     </td>
