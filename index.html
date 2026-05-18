@@ -46,6 +46,7 @@ select.biz:focus{outline:none;border-color:var(--orange)}
 .tab{padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s;white-space:nowrap}
 .tab:hover{color:var(--ink2)}.tab.on{color:var(--orange);border-bottom-color:var(--orange)}
 .tab.tab-alert{color:var(--red)!important}.tab.tab-alert .bdg{background:var(--rl);color:var(--red)}
+.tab.tab-orange{color:var(--orange)!important}.tab.tab-orange .bdg{background:var(--ol);color:var(--od)}
 .bdg{display:inline-block;background:#f1f5f9;color:var(--muted);border-radius:20px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px}
 .tab.on .bdg{background:var(--ol);color:var(--od)}
 .toolbar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
@@ -224,7 +225,7 @@ table.rlt tr:hover td{background:#f8fafc}
       <div class="tab on" id="tab-recon" onclick="sw('recon')">Reconciliation <span class="bdg" id="bdg-recon">0</span></div>
       <div class="tab" id="tab-matched" onclick="sw('matched')">Matched Items <span class="bdg" id="bdg-matched">0</span></div>
       <div class="tab" id="tab-partial" onclick="sw('partial')"><span id="tab-partial-lbl">Matched Partially</span> <span class="bdg" id="bdg-partial">0</span></div>
-      <div class="tab" id="tab-writeoff" onclick="sw('writeoff')" style="color:var(--orange)">Write-offs <span class="bdg" id="bdg-writeoff">0</span></div>
+      <div class="tab" id="tab-writeoff" onclick="sw('writeoff')">Write-offs <span class="bdg" id="bdg-writeoff">0</span></div>
     </div>
 
     <div id="view-recon">
@@ -696,7 +697,9 @@ function updateBadges(){
   document.getElementById('bdg-partial').textContent=pCount;
   document.getElementById('tab-partial').classList.toggle('tab-alert',pCount>0);
   document.getElementById('tab-partial-lbl').textContent=pCount>0?'! Matched Partially':'Matched Partially';
-  document.getElementById('bdg-writeoff').textContent=matched.filter(m=>m.type==='writeoff').length;
+  const woCount=matched.filter(m=>m.type==='writeoff').length;
+  document.getElementById('bdg-writeoff').textContent=woCount;
+  document.getElementById('tab-writeoff').classList.toggle('tab-orange',woCount>0);
 }
 
 function runSuggest(){
