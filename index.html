@@ -46,7 +46,6 @@ select.biz:focus{outline:none;border-color:var(--orange)}
 .tab{padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .12s;white-space:nowrap}
 .tab:hover{color:var(--ink2)}.tab.on{color:var(--orange);border-bottom-color:var(--orange)}
 .tab.tab-alert{color:var(--red)!important}.tab.tab-alert .bdg{background:var(--rl);color:var(--red)}
-.tab.tab-orange{color:var(--orange)!important}.tab.tab-orange .bdg{background:var(--ol);color:var(--od)}
 .bdg{display:inline-block;background:#f1f5f9;color:var(--muted);border-radius:20px;padding:1px 6px;font-size:10px;font-weight:600;margin-left:4px}
 .tab.on .bdg{background:var(--ol);color:var(--od)}
 .toolbar{display:flex;align-items:center;gap:6px;margin-bottom:10px}
@@ -699,7 +698,7 @@ function updateBadges(){
   document.getElementById('tab-partial-lbl').textContent=pCount>0?'! Matched Partially':'Matched Partially';
   const woCount=matched.filter(m=>m.type==='writeoff').length;
   document.getElementById('bdg-writeoff').textContent=woCount;
-  document.getElementById('tab-writeoff').classList.toggle('tab-orange',woCount>0);
+  document.getElementById('tab-writeoff').classList.toggle('tab-alert',woCount>0);
 }
 
 function runSuggest(){
