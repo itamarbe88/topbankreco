@@ -371,7 +371,9 @@ let bankLines=[
   {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:5,    chk:false},
   {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:10,   chk:false},
   {id:'b21',date:'2024-05-12',amount:2978, cur:'ILS',cat:'Revenue',        desc:'STRIPE PAYOUT',     bank:'Bank Leumi',   acc:'IL-123-4567',type:'credit',fee:12,   fxAmt:1000,fxCur:'USD',fxRate:2.99,chk:false},
-  {id:'b22',date:'2024-05-15',amount:5000, cur:'ILS',cat:'Transfer',       desc:'INTERBANK WIRE OUT',bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:15,   isInternal:true,chk:false},
+  // Cross-currency wire: USD account (full parity) + ILS account (fuzzy amount)
+  {id:'b23',date:'2024-05-15',amount:10000,   cur:'USD',cat:'Transfer',        desc:'BANK-TX-991 WIRE OUT',  bank:'USD Account',  acc:'USD-001',      type:'debit', isInternal:true,chk:false},
+  {id:'b24',date:'2024-05-16',amount:35919.5, cur:'ILS',cat:'Cash-in-Transit', desc:'BANK-TX-995 WIRE IN',   bank:'Bank Hapoalim',acc:'IL-456-7890',  type:'credit',isInternal:true,fee:80.5,fxAmt:10000,fxCur:'USD',fxRate:3.592,chk:false},
   // 1:Many ×2
   {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   {id:'b14',date:'2024-05-18',amount:9000, cur:'ILS',cat:'Services',       desc:'PROJECT INVOICE',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
@@ -402,7 +404,8 @@ let ledgerItems=[
   {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
   {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
   {id:'l21',date:'2024-05-10',amount:3000, cur:'ILS',cat:'Revenue',        desc:'One-time vendor service fee',acc:'REV-002',type:'credit',fxAmt:1000,fxCur:'USD',fxRate:3.00,chk:false},
-  {id:'l22',date:'2024-05-16',amount:4976, cur:'ILS',cat:'Transfer',       desc:'Funds cleared receiving account',acc:'IL-456-7890',type:'credit',chk:false},
+  {id:'l23',date:'2024-05-15',amount:10000,   cur:'USD',cat:'Transfer',        desc:'JE-1001/L-02 Wire sent',         acc:'JE1001-L02',  type:'credit',fxAmt:36500,fxCur:'ILS',fxRate:3.65,chk:false},
+  {id:'l24',date:'2024-05-15',amount:36500,   cur:'ILS',cat:'Cash-in-Transit', desc:'JE-1001/L-01 Cash-in-Transit',   acc:'JE1001-L01',  type:'debit', chk:false},
   // 1:Many ×2
   {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
   {id:'l5', date:'2024-05-05',amount:2000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 2',   acc:'CST-001',type:'debit', chk:false},
