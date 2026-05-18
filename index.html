@@ -78,6 +78,7 @@ select.biz:focus{outline:none;border-color:var(--orange)}
 .tg-many1{background:var(--pkl);color:var(--pink)}
 .tg-rule{background:var(--al);color:var(--amber)}
 .tg-manual{background:var(--pl);color:var(--purple)}
+.tg-partial{background:var(--al);color:var(--amber)}
 .tg-sug{background:var(--gl);color:var(--green)}
 .tg-info{background:var(--bl);color:var(--blue)}
 .tg-new{background:var(--al);color:var(--amber);border:1.5px dashed var(--amber)}
@@ -779,6 +780,12 @@ function writeOff(bankId,ledgerId){
 }
 
 function keepOpen(bankId,ledgerId){
+  const b=bankLines.find(x=>x.id===bankId),l=ledgerItems.find(x=>x.id===ledgerId);
+  if(!b||!l)return;
+  matchCounter++;
+  matched.push({id:matchCounter,on:new Date().toLocaleDateString('en-GB'),banks:[b],ledgers:[l],type:'partial',kind:'Partially Paid'});
+  bankLines=bankLines.filter(x=>x.id!==bankId);
+  ledgerItems=ledgerItems.filter(x=>x.id!==ledgerId);
   const gi=suggGroups.findIndex(g=>g.type==='famt');
   if(gi>=0){
     const g=suggGroups[gi];
@@ -787,8 +794,8 @@ function keepOpen(bankId,ledgerId){
     if(!g.bankIds.length)suggGroups.splice(gi,1);
   }
   if(!suggGroups.length)sugDone=false;
-  render();updateBadges();
-  toast('Kept open — items returned to unmatched','blue');
+  render();renderMatched();updateBadges();
+  toast('Marked as partial payment ✓','blue');
 }
 
 function renderMatched(){
@@ -800,7 +807,7 @@ function renderMatched(){
     <td><div class="pl">${m.banks.map(b=>`<strong>${b.desc}</strong>`).join('<br>')}<span>${m.banks.map(b=>b.date+' · '+b.cat).join(' / ')}</span></div></td>
     <td><div class="pl">${m.ledgers.map(l=>`<strong>${l.desc}</strong>`).join('<br>')}<span>${m.ledgers.map(l=>l.date+' · '+l.cat).join(' / ')}</span></div></td>
     <td style="font-weight:700;color:var(--black)">${fmt(m.banks.reduce((a,b)=>a+b.amount,0))}</td>
-    <td><span class="tag ${m.type==='suggestion'?'tg-sug':'tg-manual'}">${m.type}</span></td>
+    <td><span class="tag ${m.type==='suggestion'?'tg-sug':m.type==='partial'?'tg-partial':'tg-manual'}">${m.type==='partial'?'partial':m.type}</span></td>
     <td><span class="tag tg-info">${m.kind}</span></td>
     <td><button class="btn-danger-sm" onclick="cancelMatch(${m.id})">Cancel</button></td>
   </tr>`).join('');
