@@ -367,10 +367,11 @@ let bankLines=[
   // 1:1 Fuzzy Text ×2
   {id:'b2', date:'2024-05-02',amount:8000, cur:'ILS',cat:'Payroll',        desc:'SALARY PROCESSING', bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
   {id:'b12',date:'2024-05-16',amount:12000,cur:'ILS',cat:'Payroll',        desc:'SALARY BATCH',      bank:'Bank Hapoalim',acc:'IL-456-7890',type:'debit', chk:false},
-  // 1:1 Fuzzy Amount ×2  (bank < ledger)
-  {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
-  {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
-  {id:'b21',date:'2024-05-12',amount:1850, cur:'USD',cat:'SaaS',           desc:'STRIPE INC',         bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
+  // 1:1 Fuzzy Amount — vendor single-account ×3, internal multi-account ×1
+  {id:'b3', date:'2024-05-03',amount:245,  cur:'ILS',cat:'Utilities',      desc:'MUNICIPAL POWER',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:0,    chk:false},
+  {id:'b13',date:'2024-05-17',amount:440,  cur:'ILS',cat:'Telecoms',       desc:'BEZEQ INTL',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:5,    chk:false},
+  {id:'b21',date:'2024-05-12',amount:1850, cur:'USD',cat:'SaaS',           desc:'STRIPE INC',        bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:12.5, chk:false},
+  {id:'b22',date:'2024-05-15',amount:5000, cur:'ILS',cat:'Transfer',       desc:'INTERBANK WIRE OUT',bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', fee:15,   isInternal:true,chk:false},
   // 1:Many ×2
   {id:'b4', date:'2024-05-05',amount:5000, cur:'ILS',cat:'Consulting',     desc:'CONSULTANCY SVC',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
   {id:'b14',date:'2024-05-18',amount:9000, cur:'ILS',cat:'Services',       desc:'PROJECT INVOICE',   bank:'Bank Leumi',   acc:'IL-123-4567',type:'debit', chk:false},
@@ -401,6 +402,7 @@ let ledgerItems=[
   {id:'l3', date:'2024-05-05',amount:250,  cur:'ILS',cat:'Utilities',       desc:'Electricity bill May',      acc:'UTL-001',type:'debit', chk:false},
   {id:'l13',date:'2024-05-19',amount:450,  cur:'ILS',cat:'Telecoms',        desc:'Monthly phone bill',        acc:'TEL-001',type:'debit', chk:false},
   {id:'l21',date:'2024-05-14',amount:1900, cur:'USD',cat:'SaaS',           desc:'Monthly subscription fee',  acc:'SVC-002',type:'debit', chk:false},
+  {id:'l22',date:'2024-05-16',amount:4976, cur:'ILS',cat:'Transfer',       desc:'Funds cleared receiving account',acc:'IL-456-7890',type:'credit',chk:false},
   // 1:Many ×2
   {id:'l4', date:'2024-05-05',amount:3000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 1',   acc:'CST-001',type:'debit', chk:false},
   {id:'l5', date:'2024-05-05',amount:2000, cur:'ILS',cat:'Consulting',      desc:'Consultant fee – part 2',   acc:'CST-001',type:'debit', chk:false},
@@ -419,7 +421,7 @@ let rules=[
   {id:'r3',bdesc:'ZOOM',   bcat:'Software', tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Zoom video subscription',   lcat:'Comms'},
   {id:'r4',bdesc:'WOLT',   bcat:'Dining',   tx:'debit',rail:'',amin:'',   amax:'',    bacc:'',           mcc:'',ldesc:'Team lunch / catering',     lcat:'Dining'},
 ];
-let matched=[],suggGroups=[],matchCounter=0,sugDone=false;
+let matched=[],suggGroups=[],matchCounter=0,sugDone=false,dismissed=new Set();
 
 const fmt=n=>'₪ '+new Intl.NumberFormat('en-IL').format(n);
 const fmtC=(n,cur)=>(cur==='USD'?'$ ':cur==='EUR'?'€ ':'₪ ')+new Intl.NumberFormat('en-IL').format(n);
@@ -458,7 +460,7 @@ function render(){
       // group header — no tag badge, plain text label
       const hr=document.createElement('tr');hr.className='gh';
       let hNote=isR?' · <i style="color:var(--amber)">ledger items will be created on confirm</i>'
-               :isFamt?' · <i style="color:var(--amber)">write-off entry will be created for the difference on confirm</i>':'';
+               :isFamt?' · <i style="color:var(--muted)">resolve each pair individually — write-off or partial payment · uncheck a pair to dismiss it from future runs</i>':'';
       hr.innerHTML=`<td colspan="8" style="padding:8px 12px">
         <span style="font-size:12px;font-weight:700;color:var(--ink2);margin-right:6px">${meta.label}</span>
         <span style="font-size:11px;color:var(--muted);font-weight:400">${bItems.length} bank · ${lItems.length} ledger${hNote}</span>
@@ -481,17 +483,37 @@ function render(){
           }
         });
       } else if(isFamt){
-        // Fuzzy amount: per-row Write Off / Keep Open buttons, no group-level Confirm
         const rc=Math.max(bItems.length,lItems.length);
         for(let i=0;i<rc;i++){
           const b=bItems[i],l=lItems[i];
+          if(!b&&!l)continue;
+          const isDis=b&&l&&dismissed.has(b.id+':'+l.id);
           const isFX=b&&b.cur!=='ILS';
-          const amtTag=b?`<span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isFX?'FX':'Bank Fee'}</span>`:'';
-          const ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
-            <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:82px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
-            <button class="btn-danger-sm" style="font-size:10px;padding:3px 5px;width:82px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Partial Payment</button>
-          </div>`:'';
-          body.appendChild(mkRow(b||null,l||null,null,null,false,1,false,ctr,false,amtTag));
+          const isInt=b&&!!b.isInternal;
+          const pDiff=b&&l?Math.round(Math.abs(b.amount-l.amount)*100)/100:0;
+          const pFee=b?Math.round((b.fee||0)*100)/100:0;
+          const pFX=Math.max(0,Math.round((pDiff-pFee)*100)/100);
+          const varLabel=isInt?'Spread':'FX diff';
+          const varLine=b&&l?`<div style="font-size:10px;color:var(--subtle);line-height:1.7;text-align:center;margin-bottom:2px">`
+            +`<b style="color:var(--ink2)">${fmtC(pDiff,b.cur)}</b> variance<br>`
+            +`Fee ${fmtC(pFee,b.cur)} · ${varLabel} ${fmtC(pFX,b.cur)}</div>`:'';
+          const amtTag=b&&!isDis?`<span class="tag ${isFX?'tg-info':'tg-famt'}" style="font-size:10px">${isInt?'Internal':(isFX?'FX':'Bank Fee')}</span>`:'';
+          let ctr;
+          if(isDis){
+            ctr=`<div style="display:flex;flex-direction:column;gap:5px;align-items:center">
+              <span style="font-size:11px;font-weight:700;color:var(--subtle)">✕ Dismissed</span>
+              <button style="font-size:10px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 0;text-decoration:underline" onclick="undismiss('${b.id}','${l.id}')">Restore</button>
+            </div>`;
+          } else {
+            ctr=b&&l?`<div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+              ${varLine}
+              <button class="btn btn-success btn-sm" style="font-size:11px;padding:3px 9px;width:82px" onclick="writeOff('${b.id}','${l.id}')">Write Off</button>
+              ${!isInt?`<button class="btn-danger-sm" style="font-size:10px;padding:3px 5px;width:82px;text-align:center" onclick="keepOpen('${b.id}','${l.id}')">Partial Payment</button>`:''}
+            </div>`:'';
+          }
+          const row=mkRow(b||null,l||null,null,null,false,1,false,ctr,false,amtTag);
+          if(isDis)row.classList.add('grp-gray');
+          body.appendChild(row);
         }
       } else {
         // Default: full/ftxt/rule/many1 (non-subMatches)
@@ -600,13 +622,21 @@ function toggle(side,id,chk){
     const b=bankLines.find(x=>x.id===id);if(b)b.chk=chk;
     if(sugDone){
       const g=suggGroups.find(g=>['full','ftxt','famt'].includes(g.type)&&g.bankIds.includes(id));
-      if(g){const l=ledgerItems.find(x=>x.id===g.ledgerIds[g.bankIds.indexOf(id)]);if(l)l.chk=chk;}
+      if(g){
+        const pi=g.bankIds.indexOf(id);
+        const l=ledgerItems.find(x=>x.id===g.ledgerIds[pi]);if(l)l.chk=chk;
+        if(g.type==='famt'){const key=id+':'+g.ledgerIds[pi];chk?dismissed.delete(key):dismissed.add(key);}
+      }
     }
   } else {
     const l=ledgerItems.find(x=>x.id===id);if(l)l.chk=chk;
     if(sugDone){
       const g=suggGroups.find(g=>['full','ftxt','famt'].includes(g.type)&&g.ledgerIds.includes(id));
-      if(g){const b=bankLines.find(x=>x.id===g.bankIds[g.ledgerIds.indexOf(id)]);if(b)b.chk=chk;}
+      if(g){
+        const pi=g.ledgerIds.indexOf(id);
+        const b=bankLines.find(x=>x.id===g.bankIds[pi]);if(b)b.chk=chk;
+        if(g.type==='famt'){const key=g.bankIds[pi]+':'+id;chk?dismissed.delete(key):dismissed.add(key);}
+      }
     }
   }
   render();
@@ -681,7 +711,7 @@ function runSuggest(){
       ledgerItems.forEach(l=>{
         if(usedL.has(l.id)||usedB.has(b.id))return;
         const co=b.cat.split(' ')[0].toLowerCase()===l.cat.split(' ')[0].toLowerCase();
-        if(co&&b.cur===l.cur&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
+        if(co&&b.cur===l.cur&&!dismissed.has(b.id+':'+l.id)&&Math.abs(b.amount-l.amount)/b.amount<0.03&&dayDiff(b.date,l.date)<=4){
           famtG.bankIds.push(b.id);famtG.ledgerIds.push(l.id);
           usedB.add(b.id);usedL.add(l.id);
         }
@@ -790,6 +820,12 @@ function writeOff(bankId,ledgerId){
   toast('Write-off confirmed ✓');
 }
 
+function undismiss(bankId,ledgerId){
+  dismissed.delete(bankId+':'+ledgerId);
+  const b=bankLines.find(x=>x.id===bankId),l=ledgerItems.find(x=>x.id===ledgerId);
+  if(b)b.chk=true;if(l)l.chk=true;
+  render();toast('Pair restored ✓','blue');
+}
 function keepOpen(bankId,ledgerId){
   const b=bankLines.find(x=>x.id===bankId),l=ledgerItems.find(x=>x.id===ledgerId);
   if(!b||!l)return;
